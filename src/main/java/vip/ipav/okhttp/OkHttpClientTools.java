@@ -5,7 +5,7 @@ import okhttp3.Dispatcher;
 import vip.ipav.okhttp.builder.*;
 
 public class OkHttpClientTools {
-    private static okhttp3.OkHttpClient mOkHttpClient;
+    private okhttp3.OkHttpClient mOkHttpClient;
 
     private static class LazyHolder {
         private static final OkHttpClientTools INSTANCE = new OkHttpClientTools();
@@ -22,17 +22,15 @@ public class OkHttpClientTools {
     /**
      * construct
      */
-    private OkHttpClientTools()
-    {
+    private OkHttpClientTools() {
         this(null);
     }
 
     /**
-     * construct
-     * @param okHttpClient custom okhttpclient
+     * 自定义客户端
+     * @param okHttpClient
      */
-    public OkHttpClientTools(okhttp3.OkHttpClient okHttpClient)
-    {
+    public OkHttpClientTools(okhttp3.OkHttpClient okHttpClient) {
         if(mOkHttpClient == null) {
             synchronized (OkHttpClientTools.class) {
                 if (mOkHttpClient == null) {
@@ -74,10 +72,6 @@ public class OkHttpClientTools {
         return new DownloadBuilder(this);
     }
 
-    /**
-     * do cacel by tag
-     * @param tag tag
-     */
     public void cancel(Object tag) {
         Dispatcher dispatcher = mOkHttpClient.dispatcher();
         for (Call call : dispatcher.queuedCalls()) {
