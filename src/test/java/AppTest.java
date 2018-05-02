@@ -1,6 +1,7 @@
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import okhttp3.OkHttpClient;
+import com.google.gson.JsonObject;
+import okhttp3.*;
 
 import org.junit.Test;
 import vip.ipav.okhttp.OkHttpClientTools;
@@ -12,6 +13,9 @@ import vip.ipav.okhttp.util.RegularUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import static org.junit.Assert.assertTrue;
@@ -132,6 +136,43 @@ public class AppTest
                 });
         countDownLatch.await();
     }
+
+    @Test
+    public void testCookie() throws IOException {
+        /*通过header设置cookie*/
+        String str = OkHttpClientTools.getInstance()
+                .get()
+                .url("http://ftxh5-daily.ttyingqiu.com/api/weibo/queryChargeInfo.json?agentId=100031&platform=wap&version=1.0.0")
+                .addHeader("Cookie", "agentId=100031;device_uuid=ovUb1xnFAfYEu15-fPmUm4zzqClAmMVzt6y-m5zKgnfDo;MEIQIA_EXTRA_TRACK_ID=142LupsDtyHgMw5yRcYmM3qrhga;ftx_token=f960a6554b9968a4d69462aeadc29fc8")
+                .execute().body().string();
+        System.out.println(str);
+
+        /*通过CookieJar自动管理cookie*/
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+            .cookieJar(new CookieJar() {
+                @Override
+                public void saveFromResponse(HttpUrl httpUrl, List<Cookie> list) {
+                    System.out.println(list);
+                }
+
+                @Override
+                public List<Cookie> loadForRequest(HttpUrl httpUrl) {
+                    System.out.println(httpUrl.pathSegments());
+                    ArrayList<Cookie> cookies = new ArrayList<>(8);
+                    cookies.add(new Cookie.Builder().name("agentId").value("100031").domain("ttyingqiu.com").build());
+                    cookies.add(new Cookie.Builder().name("device_uuid").value("ovUb1xnFAfYEu15-fPmUm4zzqClAmMVzt6y-m5zKgnfDo").domain("ttyingqiu.com").build());
+                    cookies.add(new Cookie.Builder().name("MEIQIA_EXTRA_TRACK_ID").value("142LupsDtyHgMw5yRcYmM3qrhga").domain("ttyingqiu.com").build());
+                    cookies.add(new Cookie.Builder().name("ftx_token").value("f960a6554b9968a4d69462aeadc29fc8").domain("ttyingqiu.com").build());
+                    return cookies;
+                }
+            }).build();
+        str = new OkHttpClientTools(okHttpClient)
+                .get()
+                .url("http://ftxh5-daily.ttyingqiu.com/api/weibo/queryChargeInfo.json?agentId=100031&platform=wap&version=1.0.0")
+                .execute().body().string();
+        System.out.println(str);
+    }
+
 
 
 }
