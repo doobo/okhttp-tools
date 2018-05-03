@@ -6,7 +6,6 @@ import okhttp3.RequestBody;
 import vip.ipav.okhttp.OkHttpClientTools;
 import vip.ipav.okhttp.callback.MyCallback;
 import vip.ipav.okhttp.response.IResponseHandler;
-import vip.ipav.okhttp.util.LogUtils;
 
 public class PatchBuilder extends OkHttpRequestBuilder<PatchBuilder> {
 
@@ -35,7 +34,6 @@ public class PatchBuilder extends OkHttpRequestBuilder<PatchBuilder> {
                     .newCall(request)
                     .enqueue(new MyCallback(responseHandler));
         } catch (Exception e) {
-            LogUtils.e("Patch enqueue error:" + e.getMessage());
             responseHandler.onFailure(0, e.getMessage());
         }
     }

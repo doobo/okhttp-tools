@@ -5,7 +5,6 @@ import vip.ipav.okhttp.OkHttpClientTools;
 import vip.ipav.okhttp.body.ProgressRequestBody;
 import vip.ipav.okhttp.callback.MyCallback;
 import vip.ipav.okhttp.response.IResponseHandler;
-import vip.ipav.okhttp.util.LogUtils;
 
 
 import java.io.File;
@@ -93,7 +92,6 @@ public class UploadBuilder extends OkHttpRequestBuilderHasParam<UploadBuilder> {
 
             mOkHttpClientTools.getOkHttpClient().newCall(request).enqueue(new MyCallback(responseHandler));
         } catch (Exception e) {
-            LogUtils.e("Upload enqueue error:" + e.getMessage());
             responseHandler.onFailure(0, e.getMessage());
         }
     }

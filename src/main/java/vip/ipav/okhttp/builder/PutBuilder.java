@@ -6,7 +6,6 @@ import okhttp3.RequestBody;
 import vip.ipav.okhttp.OkHttpClientTools;
 import vip.ipav.okhttp.callback.MyCallback;
 import vip.ipav.okhttp.response.IResponseHandler;
-import vip.ipav.okhttp.util.LogUtils;
 
 /**
  * put builder
@@ -40,7 +39,6 @@ public class PutBuilder extends OkHttpRequestBuilder<PutBuilder> {
                     .newCall(request)
                     .enqueue(new MyCallback(responseHandler));
         } catch (Exception e) {
-            LogUtils.e("Put enqueue error:" + e.getMessage());
             responseHandler.onFailure(0, e.getMessage());
         }
     }

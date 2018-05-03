@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.internal.$Gson$Types;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
-import vip.ipav.okhttp.util.LogUtils;
 
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
@@ -40,7 +39,6 @@ public abstract class GsonResponseHandler<T> implements IResponseHandler {
             responseBodyStr = responseBody.string();
         } catch (IOException e) {
             e.printStackTrace();
-            LogUtils.e("onResponse fail read response body");
             onFailure(response.code(), "fail read response body");
             return;
         } finally {

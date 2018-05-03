@@ -5,7 +5,6 @@ import vip.ipav.okhttp.OkHttpClientTools;
 import vip.ipav.okhttp.body.ResponseProgressBody;
 import vip.ipav.okhttp.callback.MyDownloadCallback;
 import vip.ipav.okhttp.response.DownloadResponseHandler;
-import vip.ipav.okhttp.util.LogUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -156,7 +155,6 @@ public class DownloadBuilder {
 
             return call;
         } catch (Exception e) {
-            LogUtils.e("Download enqueue error:" + e.getMessage());
             downloadResponseHandler.onFailure(e.getMessage());
             return null;
         }

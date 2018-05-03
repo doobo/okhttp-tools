@@ -5,7 +5,6 @@ import okhttp3.Callback;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import vip.ipav.okhttp.response.DownloadResponseHandler;
-import vip.ipav.okhttp.util.LogUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -76,7 +75,6 @@ public class MyDownloadCallback implements Callback {
                             }
                         }.run();
                     } else {
-                        LogUtils.e("onResponse saveFile fail", e);
                         new Runnable() {
                             @Override
                             public void run() {

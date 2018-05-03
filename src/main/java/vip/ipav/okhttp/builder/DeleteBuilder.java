@@ -5,7 +5,6 @@ import okhttp3.Request;
 import vip.ipav.okhttp.OkHttpClientTools;
 import vip.ipav.okhttp.callback.MyCallback;
 import vip.ipav.okhttp.response.IResponseHandler;
-import vip.ipav.okhttp.util.LogUtils;
 
 public class DeleteBuilder extends OkHttpRequestBuilder<DeleteBuilder> {
 
@@ -33,7 +32,6 @@ public class DeleteBuilder extends OkHttpRequestBuilder<DeleteBuilder> {
                     .newCall(request)
                     .enqueue(new MyCallback(responseHandler));
         } catch (Exception e) {
-            LogUtils.e("Delete enqueue error:" + e.getMessage());
             responseHandler.onFailure(0, e.getMessage());
         }
     }
