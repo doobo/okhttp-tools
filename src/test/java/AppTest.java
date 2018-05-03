@@ -3,12 +3,14 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.gson.JsonObject;
 import okhttp3.*;
 
+import okhttp3.logging.HttpLoggingInterceptor;
 import org.junit.Test;
 import vip.ipav.okhttp.OkHttpClientTools;
 import vip.ipav.okhttp.response.DownloadResponseHandler;
 import vip.ipav.okhttp.response.GsonResponseHandler;
 import vip.ipav.okhttp.response.JsonResponseHandler;
 import vip.ipav.okhttp.response.RawResponseHandler;
+import vip.ipav.okhttp.util.HttpLogger;
 import vip.ipav.okhttp.util.RegularUtils;
 
 import java.io.File;
@@ -169,6 +171,29 @@ public class AppTest
         str = new OkHttpClientTools(okHttpClient)
                 .get()
                 .url("http://ftxh5-daily.ttyingqiu.com/api/weibo/queryChargeInfo.json?agentId=100031&platform=wap&version=1.0.0")
+                .execute().body().string();
+        System.out.println(str);
+    }
+
+    /**
+     * 请求日志跟踪
+     * @throws IOException
+     */
+    @Test
+    public void logTest() throws IOException {
+        //创建日志拦截器
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor(new HttpLogger());
+        //设置日志级别，共包含四个级别：NONE、BASIC、HEADERS、BODY
+        logging.setLevel(HttpLoggingInterceptor.Level.HEADERS);
+        OkHttpClient client = new OkHttpClient.Builder()
+                .addInterceptor(logging)
+                .build();
+
+        String str = new OkHttpClientTools(client)
+                .get()
+                .url("https://api.t.sina.com.cn/short_url/shorten.json")
+                .addParam("source","3271760578")
+                .addParam("url_long","http://www.douban.com/note/249723561")
                 .execute().body().string();
         System.out.println(str);
     }
