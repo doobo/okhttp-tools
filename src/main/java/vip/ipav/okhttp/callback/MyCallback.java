@@ -28,7 +28,7 @@ public class MyCallback implements Callback {
         if(response.isSuccessful()) {
             mResponseHandler.onSuccess(response);
         } else {
-            mResponseHandler.onFailure(response.code(),response.toString());
+            mResponseHandler.onFailure(response.code(),response.message());
         }
     }
 }

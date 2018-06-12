@@ -87,12 +87,40 @@ public class UploadBuilder extends OkHttpRequestBuilderHasParam<UploadBuilder> {
             appendParts(multipartBuilder, mExtraParts);
 
             builder.post(new ProgressRequestBody(multipartBuilder.build(),responseHandler));
-
             Request request = builder.build();
-
             mOkHttpClientTools.getOkHttpClient().newCall(request).enqueue(new MyCallback(responseHandler));
         } catch (Exception e) {
             responseHandler.onFailure(0, e.getMessage());
+        }
+    }
+
+    /**
+     * 同步执行
+     * @return
+     */
+    public Response execute() {
+        try {
+            if(mUrl == null || mUrl.length() == 0) {
+                throw new IllegalArgumentException("url can not be null !");
+            }
+            Request.Builder builder = new Request.Builder().url(mUrl);
+            appendHeaders(builder, mHeaders);
+
+            if (mTag != null) {
+                builder.tag(mTag);
+            }
+
+            MultipartBody.Builder multipartBuilder = new MultipartBody.Builder().setType(MultipartBody.FORM);
+            appendParams(multipartBuilder, mParams);
+            appendFiles(multipartBuilder, mFiles);
+            appendParts(multipartBuilder, mExtraParts);
+
+            builder.post(multipartBuilder.build());
+            Request request = builder.build();
+            return mOkHttpClientTools.getOkHttpClient().newCall(request).execute();
+        } catch (Exception e) {
+            new RuntimeException(e.getMessage());
+            return null;
         }
     }
 

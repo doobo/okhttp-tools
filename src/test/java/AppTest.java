@@ -6,10 +6,7 @@ import okhttp3.*;
 import okhttp3.logging.HttpLoggingInterceptor;
 import org.junit.Test;
 import vip.ipav.okhttp.OkHttpClientTools;
-import vip.ipav.okhttp.response.DownloadResponseHandler;
-import vip.ipav.okhttp.response.GsonResponseHandler;
-import vip.ipav.okhttp.response.JsonResponseHandler;
-import vip.ipav.okhttp.response.RawResponseHandler;
+import vip.ipav.okhttp.response.*;
 import vip.ipav.okhttp.util.HttpLogger;
 import vip.ipav.okhttp.util.RegularUtils;
 
@@ -25,8 +22,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * Unit test for simple App.
  */
-public class AppTest 
-{
+public class AppTest {
     @Test
     public void testJsonOkHttp() throws InterruptedException {
         CountDownLatch countDownLatch = new CountDownLatch(1);
@@ -89,16 +85,16 @@ public class AppTest
     public void testSyncGet() throws IOException {
         String temp =
                 OkHttpClientTools.getInstance()
-                .get()
-                .url("http://api.t.sina.com.cn/short_url/shorten.json")
-                .addParam("source","3271760578")
-                .addParam("url_long","http://www.douban.com/note/249723561")
-                .execute().body().string();
+                        .get()
+                        .url("http://api.t.sina.com.cn/short_url/shorten.json")
+                        .addParam("source", "3271760578")
+                        .addParam("url_long", "http://www.douban.com/note/249723561")
+                        .execute().body().string();
         System.out.println(temp);
     }
 
     @Test
-    public void testUtils(){
+    public void testUtils() {
         System.out.println(RegularUtils.hasWenHao("?abc=123"));
         System.out.println(RegularUtils.hasWenHao(".abc=123?"));
         System.out.println(RegularUtils.hasWenHao("https://www.baidu.com?abc=123"));
@@ -115,7 +111,7 @@ public class AppTest
                 .enqueue(new DownloadResponseHandler() {
                     @Override
                     public void onStart(long totalBytes) {
-                        System.out.println("The File is Downing "+totalBytes);
+                        System.out.println("The File is Downing " + totalBytes);
                     }
 
                     @Override
@@ -127,7 +123,7 @@ public class AppTest
 
                     @Override
                     public void onProgress(long currentBytes, long totalBytes) {
-                        System.out.println( "doDownload onProgress:" + currentBytes + "/" + totalBytes);
+                        System.out.println("doDownload onProgress:" + currentBytes + "/" + totalBytes);
                     }
 
                     @Override
@@ -151,23 +147,23 @@ public class AppTest
 
         /*通过CookieJar自动管理cookie*/
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
-            .cookieJar(new CookieJar() {
-                @Override
-                public void saveFromResponse(HttpUrl httpUrl, List<Cookie> list) {
-                    System.out.println(list);
-                }
+                .cookieJar(new CookieJar() {
+                    @Override
+                    public void saveFromResponse(HttpUrl httpUrl, List<Cookie> list) {
+                        System.out.println(list);
+                    }
 
-                @Override
-                public List<Cookie> loadForRequest(HttpUrl httpUrl) {
-                    System.out.println(httpUrl.pathSegments());
-                    ArrayList<Cookie> cookies = new ArrayList<>(8);
-                    cookies.add(new Cookie.Builder().name("agentId").value("100031").domain("ttyingqiu.com").build());
-                    cookies.add(new Cookie.Builder().name("device_uuid").value("ovUb1xnFAfYEu15-fPmUm4zzqClAmMVzt6y-m5zKgnfDo").domain("ttyingqiu.com").build());
-                    cookies.add(new Cookie.Builder().name("MEIQIA_EXTRA_TRACK_ID").value("142LupsDtyHgMw5yRcYmM3qrhga").domain("ttyingqiu.com").build());
-                    cookies.add(new Cookie.Builder().name("ftx_token").value("f960a6554b9968a4d69462aeadc29fc8").domain("ttyingqiu.com").build());
-                    return cookies;
-                }
-            }).build();
+                    @Override
+                    public List<Cookie> loadForRequest(HttpUrl httpUrl) {
+                        System.out.println(httpUrl.pathSegments());
+                        ArrayList<Cookie> cookies = new ArrayList<>(8);
+                        cookies.add(new Cookie.Builder().name("agentId").value("100031").domain("ttyingqiu.com").build());
+                        cookies.add(new Cookie.Builder().name("device_uuid").value("ovUb1xnFAfYEu15-fPmUm4zzqClAmMVzt6y-m5zKgnfDo").domain("ttyingqiu.com").build());
+                        cookies.add(new Cookie.Builder().name("MEIQIA_EXTRA_TRACK_ID").value("142LupsDtyHgMw5yRcYmM3qrhga").domain("ttyingqiu.com").build());
+                        cookies.add(new Cookie.Builder().name("ftx_token").value("f960a6554b9968a4d69462aeadc29fc8").domain("ttyingqiu.com").build());
+                        return cookies;
+                    }
+                }).build();
         str = new OkHttpClientTools(okHttpClient)
                 .get()
                 .url("http://ftxh5-daily.ttyingqiu.com/api/weibo/queryChargeInfo.json?agentId=100031&platform=wap&version=1.0.0")
@@ -177,6 +173,7 @@ public class AppTest
 
     /**
      * 请求日志跟踪
+     *
      * @throws IOException
      */
     @Test
@@ -192,12 +189,88 @@ public class AppTest
         String str = new OkHttpClientTools(client)
                 .get()
                 .url("https://api.t.sina.com.cn/short_url/shorten.json")
-                .addParam("source","3271760578")
-                .addParam("url_long","http://www.douban.com/note/249723561")
+                .addParam("source", "3271760578")
+                .addParam("url_long", "http://www.douban.com/note/249723561")
                 .execute().body().string();
         System.out.println(str);
     }
 
+    @Test
+    public void testCup() throws IOException {
+        //创建日志拦截器
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor(new HttpLogger());
+        //设置日志级别，共包含四个级别：NONE、BASIC、HEADERS、BODY
+        logging.setLevel(HttpLoggingInterceptor.Level.HEADERS);
+        OkHttpClient client = new OkHttpClient.Builder()
+                .addInterceptor(logging)
+                .build();
 
+        String result = new OkHttpClientTools(client)
+                .get()
+                .url("http://www.baidu.com")
+                .addParam("a", "B")
+                .execute().body().string();
+        System.out.println(result);
+    }
+
+    @Test
+    public void testEqual() {
+        OkHttpClientTools ok1 = OkHttpClientTools.getInstance();
+        OkHttpClientTools ok2 = OkHttpClientTools.getInstance();
+        System.out.println(ok1);
+        System.out.println(ok2);
+
+        OkHttpClientTools ok3 = new OkHttpClientTools(new OkHttpClient());
+        OkHttpClientTools ok4 = new OkHttpClientTools(new OkHttpClient());
+        System.out.println(ok3);
+        System.out.println(ok4);
+    }
+
+    @Test
+    public void testFileUpload() throws IOException {
+        //创建日志拦截器
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor(new HttpLogger());
+        //设置日志级别，共包含四个级别：NONE、BASIC、HEADERS、BODY
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+        OkHttpClient client = new OkHttpClient.Builder()
+                .addInterceptor(logging)
+                .build();
+
+        String str = new OkHttpClientTools(client)
+                .upload()
+                .url("http://pic.sogou.com/pic/upload_pic.jsp")
+                .addParam("type","utf-8;text/json")
+                .addFile("files", new File("/Users/doobo/Downloads/myAirTicket.png"))
+                .execute().body().string();
+        System.out.println(str);
+    }
+
+    @Test
+    public void uploadImage() {
+        //创建日志拦截器
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor(new HttpLogger());
+        //设置日志级别，共包含四个级别：NONE、BASIC、HEADERS、BODY
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+        OkHttpClient client = new OkHttpClient.Builder()
+                .addInterceptor(logging)
+                .build();
+
+        new OkHttpClientTools(client)
+                .upload()
+                .url("http://pic.sogou.com/pic/upload_pic.jsp")
+                .addParam("type","utf-8;text/json")
+                .addFile("files", new File("/Users/doobo/Downloads/myAirTicket.png"))
+                .enqueue(new RawResponseHandler() {
+                    @Override
+                    public void onSuccess(int statusCode, String response) {
+                        System.out.println(response);
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, String error_msg) {
+                        System.out.println(error_msg);
+                    }
+                });
+    }
 
 }
