@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertTrue;
 
@@ -246,31 +247,35 @@ public class AppTest {
     }
 
     @Test
-    public void uploadImage() {
+    public void uploadImage() throws InterruptedException {
         //创建日志拦截器
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor(new HttpLogger());
         //设置日志级别，共包含四个级别：NONE、BASIC、HEADERS、BODY
-        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+        logging.setLevel(HttpLoggingInterceptor.Level.HEADERS);
         OkHttpClient client = new OkHttpClient.Builder()
                 .addInterceptor(logging)
                 .build();
 
+        CountDownLatch countDownLatch = new CountDownLatch(1);
         new OkHttpClientTools(client)
                 .upload()
                 .url("http://pic.sogou.com/pic/upload_pic.jsp")
                 .addParam("type","utf-8;text/json")
-                .addFile("files", new File("/Users/doobo/Downloads/myAirTicket.png"))
+                .addFile("files", new File("/Users/doobo/Downloads/doobo.png"))
                 .enqueue(new RawResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, String response) {
+                        countDownLatch.countDown();
                         System.out.println(response);
                     }
 
                     @Override
                     public void onFailure(int statusCode, String error_msg) {
+                        countDownLatch.countDown();
                         System.out.println(error_msg);
                     }
                 });
+        countDownLatch.await();
     }
 
 }
