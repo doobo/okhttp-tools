@@ -5,21 +5,15 @@
 
 > 对Okhttp3进行二次封装,对外提供了POST请求、GET请求、PATCH请求、PUT请求、DELETE请求、上传文件、下载文件、取消请求、Raw/Json/Gson返回、后台下载管理等功能.
 ## 参考文献
-
 对于Okhttp3的封装参考了:
-
 1. [https://github.com/hongyangAndroid/okhttputils](https://github.com/hongyangAndroid/okhttputils)
 1. [https://github.com/jeasonlzy/okhttp-OkGo](https://github.com/jeasonlzy/okhttp-OkGo)
 1. [https://github.com/ZhaoKaiQiang/OkHttpPlus](https://github.com/ZhaoKaiQiang/OkHttpPlus)
 
 cookie本地持久化使用了PersistentCookieJar：
-
 1. [https://github.com/franmontiel/PersistentCookieJar](https://github.com/franmontiel/PersistentCookieJar)
 
 ## 如何添加
-
-### 在app目录下的build.gradle中添加依赖
-
 ```java
    <repositories>
 		<repository>
@@ -36,11 +30,8 @@ cookie本地持久化使用了PersistentCookieJar：
 ```
 
 ## 1 总体简介
-
 在项目入口创建唯一MyOkhttp实例
-
 设置cookie.
-
 ```java
 //设置开启cookie
 ClearableCookieJar cookieJar =
@@ -76,11 +67,6 @@ mMyOkHttp = new MyOkHttp(okHttpClient);
 1. Gson GsonResponseHandler
 
 ## 2 调用示例
-
-### 2.1 POST请求 + Json回调示例
-
-kv参数
-
 ```java
     @Test
     public void testJsonOkHttp() throws InterruptedException {
@@ -366,9 +352,6 @@ kv参数
 
 License
 -------
-
-    Copyright 2017 SY.Tang
-
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
     You may obtain a copy of the License at
