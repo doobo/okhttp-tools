@@ -12,7 +12,6 @@
 
 cookie本地持久化使用了PersistentCookieJar：
 1. [https://github.com/franmontiel/PersistentCookieJar](https://github.com/franmontiel/PersistentCookieJar)
-
 ## 如何添加
 ```java
    <repositories>
