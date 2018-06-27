@@ -1,6 +1,7 @@
 import okhttp3.OkHttpClient;
 import org.junit.Test;
 import vip.ipav.okhttp.OkHttpClientTools;
+import vip.ipav.okhttp.util.RegularUtils;
 
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
@@ -75,5 +76,18 @@ public class HttpThread {
         }).start();
         System.out.printf("%s\t%d\n",myLocalString.get(),1);
         countDownLatch.await();
+    }
+
+    @Test
+    public void testRegular(){
+        System.out.println(RegularUtils.isUrl("https://hao.360.cn#home"));
+        System.out.println(RegularUtils.isUrl("https://hao.360.cn!"));
+        System.out.println(RegularUtils.isUrl("https://hao.360.cn;"));
+        System.out.println(RegularUtils.isUrl("https://hao.360.cn/"));
+        System.out.println(RegularUtils.isUrl("https://hao.360.cn/?src=lm&ls=n2a27c3f091"));
+        System.out.println(RegularUtils.isUrl("https://hao.360.cn#"));
+        System.out.println(RegularUtils.isUrl("https://hao.360.cn"));
+        System.out.println(RegularUtils.isUrl("https://hao.360.cn:8080/#home;status=3"));
+        System.out.println(RegularUtils.isUrl("https://hao.360.cn/;staus=1"));
     }
 }
