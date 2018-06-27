@@ -90,4 +90,14 @@ public class HttpThread {
         System.out.println(RegularUtils.isUrl("https://hao.360.cn:8080/#home;status=3"));
         System.out.println(RegularUtils.isUrl("https://hao.360.cn/;staus=1"));
     }
+
+    @Test
+    public void testUrl() throws IOException {
+        String html = OkHttpClientTools.getInstance().get()
+                .url("https://hao.360.cn/")
+                .addParam("src","lm")
+                .addParam("ls","n2a27c3f091")
+                .execute().body().string();
+        System.out.println(html);
+    }
 }
