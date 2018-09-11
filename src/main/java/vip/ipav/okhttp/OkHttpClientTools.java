@@ -48,6 +48,10 @@ public class OkHttpClientTools {
         return new GetBuilder(this);
     }
 
+    public HeadBuilder head() {
+        return new HeadBuilder(this);
+    }
+
     public PostBuilder post() {
         return new PostBuilder(this);
     }

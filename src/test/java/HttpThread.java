@@ -1,9 +1,12 @@
 import okhttp3.OkHttpClient;
 import org.junit.Test;
 import vip.ipav.okhttp.OkHttpClientTools;
+import vip.ipav.okhttp.builder.GetBuilder;
 import vip.ipav.okhttp.util.RegularUtils;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
 public class HttpThread {
@@ -98,6 +101,13 @@ public class HttpThread {
                 .addParam("src","lm")
                 .addParam("ls","n2a27c3f091")
                 .execute().body().string();
-        System.out.println(html);
+    }
+
+    @Test
+    public void testSpeedUrl(){
+        String url = "http://www.baidu.com/index.html?m=uuid&";
+        Map<String, String> params = new HashMap<>();
+        params.put("abc","123");
+        System.out.println(OkHttpClientTools.getInstance().head().appendParams(url,params));
     }
 }
