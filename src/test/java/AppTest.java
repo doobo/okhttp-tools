@@ -261,7 +261,7 @@ public class AppTest {
                 .upload()
                 .url("http://pic.sogou.com/pic/upload_pic.jsp")
                 .addParam("type","utf-8;text/json")
-                .addFile("files", new File("/Users/doobo/Downloads/doobo.png"))
+                .addFile("files", new File("/Users/doobo/Downloads/bbc.png"))
                 .enqueue(new RawResponseHandler() {
                     @Override
                     public void onSuccess(int statusCode, String response) {
