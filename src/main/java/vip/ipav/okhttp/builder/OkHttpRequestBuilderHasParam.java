@@ -3,7 +3,7 @@ package vip.ipav.okhttp.builder;
 import vip.ipav.okhttp.OkHttpClientTools;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
+@SuppressWarnings("unchecked")
 public abstract class OkHttpRequestBuilderHasParam<T extends OkHttpRequestBuilderHasParam> extends OkHttpRequestBuilder<T> {
 
     protected Map<String, String> mParams;

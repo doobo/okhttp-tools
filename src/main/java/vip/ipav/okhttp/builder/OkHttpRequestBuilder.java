@@ -7,6 +7,7 @@ import vip.ipav.okhttp.response.IResponseHandler;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+@SuppressWarnings("unchecked")
 public abstract class OkHttpRequestBuilder<T extends OkHttpRequestBuilder> {
     protected String mUrl;
     protected Object mTag;
