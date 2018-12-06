@@ -1,4 +1,5 @@
 import okhttp3.OkHttpClient;
+import okhttp3.Response;
 import org.junit.Test;
 import vip.ipav.okhttp.OkHttpClientTools;
 import vip.ipav.okhttp.builder.GetBuilder;
@@ -109,5 +110,25 @@ public class HttpThread {
         Map<String, String> params = new HashMap<>();
         params.put("abc","123");
         System.out.println(OkHttpClientTools.getInstance().head().appendParams(url,params));
+    }
+
+    @Test
+    public void testAutoLogin() throws IOException {
+        Response res = OkHttpClientTools.getInstance()
+                        .get()
+                        .url("https://m.aicai.com/m/userCenter.do?agentId=1&vt=5")
+                        .addHeader("Cookie","cookiesid=ce3ee9471-27e3-4411-ae94-d89f93dc4ce9-56911233|a3e962802165daacb807c298023a502e")
+                        .execute();
+
+        //System.out.println(res.body().string());
+        System.out.println(res.isRedirect());
+        System.out.println(res.code());
+        System.out.println(res.message());
+
+        //如果有跳转，获取跳转前的Response
+        while (res.priorResponse() != null){
+            System.out.println(res.priorResponse().code());
+            res = res.priorResponse();
+        }
     }
 }
