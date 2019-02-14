@@ -9,6 +9,7 @@ import java.io.Serializable;
 
 public class SerializableOkHttpCookies implements Serializable {
 
+    private static final long serialVersionUID = -8968659305605260654L;
     private transient final Cookie cookies;
     private transient Cookie clientCookies;
 

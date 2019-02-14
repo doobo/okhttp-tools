@@ -47,27 +47,7 @@ public class GetBuilder extends OkHttpRequestBuilderHasParam<GetBuilder> {
         }
     }
 
-    //append params to url
-    private String appendParams(String url, Map<String, String> params) {
-        StringBuilder sb = new StringBuilder();
-        if(RegularUtils.hasWenHao(url)){
-            sb.append(url+"&");
-        }else{
-            sb.append(url + "?");
-        }
-        if (params != null && !params.isEmpty()) {
-            for (String key : params.keySet()) {
-                try {
-                    sb.append(key).append("=").append(URLEncoder.encode(params.get(key),"UTF-8")).append("&");
-                } catch (UnsupportedEncodingException e) {
-                    sb.append(key).append("=").append(params.get(key)).append("&");
-                }
-            }
-        }
 
-        sb = sb.deleteCharAt(sb.length() - 1);
-        return sb.toString();
-    }
 
     /**
      * 同步执行

@@ -76,6 +76,10 @@ public class OkHttpClientTools {
         return new DownloadBuilder(this);
     }
 
+    public WsBuilder ws() {
+        return new WsBuilder(this);
+    }
+
     public void cancel(Object tag) {
         Dispatcher dispatcher = mOkHttpClient.dispatcher();
         for (Call call : dispatcher.queuedCalls()) {

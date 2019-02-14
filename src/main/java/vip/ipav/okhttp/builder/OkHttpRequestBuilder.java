@@ -4,6 +4,10 @@ import okhttp3.Headers;
 import okhttp3.Request;
 import vip.ipav.okhttp.OkHttpClientTools;
 import vip.ipav.okhttp.response.IResponseHandler;
+import vip.ipav.okhttp.util.RegularUtils;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -83,5 +87,27 @@ public abstract class OkHttpRequestBuilder<T extends OkHttpRequestBuilder> {
             headerBuilder.add(key, headers.get(key));
         }
         builder.headers(headerBuilder.build());
+    }
+
+    //append params to url
+    public String appendParams(String url, Map<String, String> params) {
+        StringBuilder sb = new StringBuilder();
+        if(RegularUtils.hasWenHao(url)){
+            sb.append(url+"&");
+        }else{
+            sb.append(url + "?");
+        }
+        if (params != null && !params.isEmpty()) {
+            for (String key : params.keySet()) {
+                try {
+                    sb.append(key).append("=").append(URLEncoder.encode(params.get(key),"UTF-8")).append("&");
+                } catch (UnsupportedEncodingException e) {
+                    sb.append(key).append("=").append(params.get(key)).append("&");
+                }
+            }
+        }
+
+        sb = sb.deleteCharAt(sb.length() - 1);
+        return sb.toString();
     }
 }
