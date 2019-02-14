@@ -23,7 +23,7 @@ cookie本地持久化使用了PersistentCookieJar：
     <dependency>
 	    <groupId>com.github.doobo</groupId>
 	    <artifactId>OkHttpTools</artifactId>
-	    <version>1.2</version>
+	    <version>1.3</version>
 	</dependency>
 ```
 
