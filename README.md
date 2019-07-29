@@ -5,11 +5,11 @@
 > 对Okhttp3进行二次封装,对外提供了POST请求、GET请求、PATCH请求、PUT请求、DELETE请求、上传文件、下载文件、取消请求、Ws/Wss请求、Raw/Json/Gson返回、后台下载管理等功能.
 ## 如何添加
 ```
-   <dependency>
-     <groupId>com.github.doobo</groupId>
-     <artifactId>okhttp-tools</artifactId>
-     <version>1.0-SNAPSHOT</version>
-   </dependency>
+ <dependency>
+   <groupId>com.github.doobo</groupId>
+   <artifactId>okhttp-tools</artifactId>
+   <version>1.0</version>
+ </dependency>
 ```
 
 ## 1 总体简介
