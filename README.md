@@ -3,13 +3,23 @@
 [![License](https://img.shields.io/badge/license-Apache%202-green.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 
 > 对Okhttp3进行二次封装,对外提供了POST请求、GET请求、PATCH请求、PUT请求、DELETE请求、上传文件、下载文件、取消请求、Ws/Wss请求、Raw/Json/Gson返回、后台下载管理等功能.
+* 如果异步使用相关JSON解析器，请主动添加该包，默认不会添加，以免引起不必要的引入,去掉对中文header内容的判断，可以在header里面添加值
+
 ## 如何添加
 ```
  <dependency>
    <groupId>com.github.doobo</groupId>
    <artifactId>okhttp-tools</artifactId>
-   <version>1.0</version>
+   <version>1.1</version>
  </dependency>
+ 
+  <!--添加网络日志拦截,如不需要,不必添加该包-->
+  <dependency>
+     <groupId>com.squareup.okhttp3</groupId>
+     <artifactId>logging-interceptor</artifactId>
+     <optional>true</optional>
+     <version>3.14.9</version>
+  </dependency>
 ```
 
 ## 1 总体简介
@@ -41,7 +51,7 @@
 5. 长连接 WsResponseHandler
 
 ## 2 调用示例
-```
+```code
    //GET请求
     @Test
     public void testSyncGet() throws IOException {
@@ -127,7 +137,7 @@
     @Test
     public void testResult() throws InterruptedException {
         CountDownLatch countDownLatch = new CountDownLatch(1);
-        String wsUrl = "ws://sport-daily.ttyingqiu.com/chatroomServer/1021";
+        String wsUrl = "ws://5fu8.com/chatroomServer/1021";
 
 
         WsBuilder builder = OkHttpClientTools.getInstance().ws()
@@ -185,7 +195,7 @@
         /*通过header设置cookie*/
         String str = OkHttpClientTools.getInstance()
                 .get()
-                .url("http://ftxh5-daily.ttyingqiu.com/api/weibo/queryChargeInfo.json?agentId=100031&platform=wap&version=1.0.0")
+                .url("http://5fu8.com/api/weibo/queryChargeInfo.json?agentId=100031&platform=wap&version=1.0.0")
                 .addHeader("Cookie", "agentId=100031;device_uuid=ovUb1xnFAfYEu15-fPmUm4zzqClAmMVzt6y-m5zKgnfDo;MEIQIA_EXTRA_TRACK_ID=142LupsDtyHgMw5yRcYmM3qrhga;ftx_token=f960a6554b9968a4d69462aeadc29fc8")
                 .execute().body().string();
         System.out.println(str);
@@ -211,7 +221,7 @@
                 }).build();
         str = new OkHttpClientTools(okHttpClient)
                 .get()
-                .url("http://ftxh5-daily.ttyingqiu.com/api/weibo/queryChargeInfo.json?agentId=100031&platform=wap&version=1.0.0")
+                .url("http://5fu8.com/api/weibo/queryChargeInfo.json?agentId=100031&platform=wap&version=1.0.0")
                 .execute().body().string();
         System.out.println(str);
     }
@@ -233,9 +243,9 @@
 
         String str = new OkHttpClientTools(client)
                 .get()
-                .url("https://api.t.sina.com.cn/short_url/shorten.json")
+                .url("https://5fu8.com/short_url/shorten.json")
                 .addParam("source", "3271760578")
-                .addParam("url_long", "http://www.douban.com/note/249723561")
+                .addParam("url_long", "http://www.5fu8.com/note/249723561")
                 .execute().body().string();
         System.out.println(str);
     }
@@ -245,7 +255,7 @@
     public void testAutoLogin() throws IOException {
         Response res = OkHttpClientTools.getInstance()
                         .get()
-                        .url("https://m.aicai.com/m/userCenter.do?agentId=1&vt=5")
+                        .url("https://5fu8.com/m/userCenter.do?agentId=1&vt=5")
                         .addHeader("Cookie","cookiesid=ce3ee9471-27e3-4411-ae94-d89f93dc4ce9-56911233|a3e962802165daacb807c298023a502e")
                         .execute();
 
@@ -258,6 +268,15 @@
             System.out.println(res.priorResponse().code());
             res = res.priorResponse();
         }
+    }
+    
+    //url拼接测试
+    @Test
+    public void testSpeedUrl(){
+        String url = "http://www.5fu8.com/index.html?m=uuid&";
+        Map<String, String> params = new HashMap<>();
+        params.put("abc","123");
+        System.out.println(OkHttpClientTools.getInstance().head().appendParams(url,params));
     }
 ```
 

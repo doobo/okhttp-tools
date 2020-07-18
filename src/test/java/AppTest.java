@@ -1,24 +1,19 @@
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.google.gson.JsonObject;
 import okhttp3.*;
 
 import okhttp3.logging.HttpLoggingInterceptor;
 import org.junit.Test;
 import vip.ipav.okhttp.OkHttpClientTools;
 import vip.ipav.okhttp.response.*;
-import vip.ipav.okhttp.util.HttpLogger;
 import vip.ipav.okhttp.util.RegularUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.assertTrue;
 
 /**
  * Unit test for simple App.
@@ -208,6 +203,7 @@ public class AppTest {
 
         String result = new OkHttpClientTools(client)
                 .get()
+                .addHeader("auth","你好")
                 .url("http://www.baidu.com")
                 .addParam("a", "B")
                 .execute().body().string();

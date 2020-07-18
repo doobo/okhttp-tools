@@ -2,9 +2,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Response;
 import org.junit.Test;
 import vip.ipav.okhttp.OkHttpClientTools;
-import vip.ipav.okhttp.builder.GetBuilder;
-import vip.ipav.okhttp.util.RegularUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,6 +42,7 @@ public class HttpThread {
         countDownLatch.await();
     }
 
+    @Test
     public void testSyncGet() throws IOException {
         String temp =
                 OkHttpClientTools.getInstance()
@@ -54,6 +54,7 @@ public class HttpThread {
         System.out.println(temp);
     }
 
+    @Test
     public void testSyncGet2() throws IOException {
         String temp =
                 new OkHttpClientTools(new OkHttpClient())
@@ -71,28 +72,12 @@ public class HttpThread {
         ThreadLocal<String> myLocalString = new ThreadLocal<>();
         myLocalString.set("www.ipav.vip");
         CountDownLatch countDownLatch = new CountDownLatch(1);
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                System.out.printf("%s\t%d\n",myLocalString.get(),0);
-                countDownLatch.countDown();
-            }
+        new Thread(() -> {
+            System.out.printf("%s\t%d\n",myLocalString.get(),0);
+            countDownLatch.countDown();
         }).start();
         System.out.printf("%s\t%d\n",myLocalString.get(),1);
         countDownLatch.await();
-    }
-
-    @Test
-    public void testRegular(){
-        System.out.println(RegularUtils.isUrl("https://hao.360.cn#home"));
-        System.out.println(RegularUtils.isUrl("https://hao.360.cn!"));
-        System.out.println(RegularUtils.isUrl("https://hao.360.cn;"));
-        System.out.println(RegularUtils.isUrl("https://hao.360.cn/"));
-        System.out.println(RegularUtils.isUrl("https://hao.360.cn/?src=lm&ls=n2a27c3f091"));
-        System.out.println(RegularUtils.isUrl("https://hao.360.cn#"));
-        System.out.println(RegularUtils.isUrl("https://hao.360.cn"));
-        System.out.println(RegularUtils.isUrl("https://hao.360.cn:8080/#home;status=3"));
-        System.out.println(RegularUtils.isUrl("https://hao.360.cn/;staus=1"));
     }
 
     @Test
@@ -102,6 +87,7 @@ public class HttpThread {
                 .addParam("src","lm")
                 .addParam("ls","n2a27c3f091")
                 .execute().body().string();
+        System.out.println(html);
     }
 
     @Test
@@ -130,5 +116,21 @@ public class HttpThread {
             System.out.println(res.priorResponse().code());
             res = res.priorResponse();
         }
+    }
+    
+    @Test
+    public void testChineseHeader() throws IOException {
+        Response ret = OkHttpClientTools.getInstance()
+                .upload()
+                .url("https://sm.ms/api/v2/upload")
+                .addHeader("Authorization","333sss")
+                .addHeader("Accept-Language", "zh-cn")
+                .addHeader("Connection", "Keep-Alive")
+                .addHeader("Accept-Charset", "UTF-8,utf-8;q=0.7,*;q=0.7")
+                .addHeader("User-Agent", "Mozilla/5.0 (SymbianOS/9.1; U; en-us) AppleWebKit/413 (KHTML, like Gecko) Safari/413")
+                .addFile("smfile",new File("/Users/doobo/Pictures/粘福字.jpeg"))
+                .execute();
+        System.out.println(ret.message());
+        System.out.println(ret.body().string());
     }
 }

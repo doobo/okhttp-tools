@@ -78,9 +78,6 @@ public class PutBuilder extends OkHttpRequestBuilderHasParam<PutBuilder> {
      * @return
      */
     public Response execute() {
-        if(!RegularUtils.isUrl(mUrl)){
-            throw new IllegalArgumentException("url is unqualified!");
-        }
         Request.Builder builder = new Request.Builder().url(mUrl);
         appendHeaders(builder, mHeaders);
 

@@ -21,10 +21,6 @@ public class HeadBuilder extends OkHttpRequestBuilderHasParam<HeadBuilder> {
     @Override
     public void enqueue(final IResponseHandler responseHandler) {
         try {
-            if(!RegularUtils.isUrl(mUrl)){
-                throw new IllegalArgumentException("url is unqualified!");
-            }
-
             if (mParams != null && mParams.size() > 0) {
                 mUrl = appendParams(mUrl, mParams);
             }
@@ -51,9 +47,6 @@ public class HeadBuilder extends OkHttpRequestBuilderHasParam<HeadBuilder> {
      * @return
      */
     public Response execute() {
-        if(!RegularUtils.isUrl(mUrl)){
-            throw new IllegalArgumentException("url is unqualified!");
-        }
         if (mParams != null && mParams.size() > 0) {
             mUrl = appendParams(mUrl, mParams);
         }

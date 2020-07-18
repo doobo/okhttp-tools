@@ -11,7 +11,10 @@ import java.io.IOException;
 
 public class ProgressRequestBody extends RequestBody {
 
-    private IResponseHandler mResponseHandler;      //回调监听
+    /**
+     * 回调监听
+     */
+    private IResponseHandler mResponseHandler;
     private RequestBody mRequestBody;
     private CountingSink mCountingSink;
 

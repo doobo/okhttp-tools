@@ -7,7 +7,7 @@
     <groupId>com.github.doobo</groupId>
     <artifactId>okhttp-tools</artifactId>
     <packaging>jar</packaging>
-    <version>1.0</version>
+    <version>1.1-SNAPSHOT</version>
 
     <name>OkHttpTools</name>
     <description>OKHttp3的简单封装，链式调用</description>
@@ -23,7 +23,7 @@
 
     <scm>
         <tag>master</tag>
-        <url>https://github.com/doobo/OkHttpTools</url>
+        <url>scm:https://github.com/doobo/OkHttpTools</url>
         <connection>scm:git:git@github.com:doobo/OkHttpTools.git</connection>
         <developerConnection>scm:git:git@github.com:doobo/OkHttpTools.git</developerConnection>
     </scm>
@@ -35,15 +35,14 @@
             <email>doobo@foxmail.com</email>
         </developer>
     </developers>
-
-
+    
     <properties>
+        <okhttp.version>3.14.9</okhttp.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
         <javadoc.version>8</javadoc.version>
         <compiler-plugin.version>3.6.2</compiler-plugin.version>
-        <war-plugin.version>3.1.0</war-plugin.version>
         <clean-plugin.version>3.0.0</clean-plugin.version>
         <resources-plugin.version>3.0.2</resources-plugin.version>
         <surefire-plugin.version>2.20</surefire-plugin.version>
@@ -51,6 +50,8 @@
         <source-plugin.version>3.0.1</source-plugin.version>
         <javadoc-plugin.version>2.10.4</javadoc-plugin.version>
         <gpg-plugin.version>1.6</gpg-plugin.version>
+        <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
+        <plugin.release.version>2.5.3</plugin.release.version>
     </properties>
 
     <distributionManagement>
@@ -71,36 +72,45 @@
 
     <dependencies>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
-            <scope>test</scope>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>${okhttp.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>com.squareup.okhttp3</groupId>
-            <artifactId>okhttp</artifactId>
-            <version>3.10.0</version>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>jsr305</artifactId>
+            <version>3.0.2</version>
         </dependency>
 
         <!--添加网络日志拦截-->
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>logging-interceptor</artifactId>
-            <version>3.10.0</version>
+            <optional>true</optional>
+            <version>${okhttp.version}</version>
         </dependency>
 
         <!--JSON支持-->
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
+            <optional>true</optional>
             <version>2.8.2</version>
         </dependency>
 
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
+            <optional>true</optional>
             <version>[1.2.31,)</version>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -176,9 +186,13 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compiler.plugin.version}</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
+                    <compilerArgs>
+                        <arg>-Xlint:unchecked</arg>
+                    </compilerArgs>
                 </configuration>
             </plugin>
             <plugin>
@@ -193,6 +207,76 @@
                 <configuration>
                     <skip>true</skip>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>${plugin.release.version}</version>
+                <configuration>
+                    <tagNameFormat>v@{project.version}</tagNameFormat>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                    <generateReleasePoms>false</generateReleasePoms>
+                    <arguments>-DskipTests</arguments>
+                    <checkModificationExcludes>
+                        <checkModificationExclude>.gitignore</checkModificationExclude>
+                        <checkModificationExclude>install.sh</checkModificationExclude>
+                        <checkModificationExclude>pom.xml</checkModificationExclude>
+                        <checkModificationExclude>README.md</checkModificationExclude>
+                    </checkModificationExcludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>${source-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <attach>true</attach>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${javadoc-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <additionalJOptions>-Xdoclint:none</additionalJOptions>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <source>8</source>
+                    <links>
+                        <link>
+                            http://docs.oracle.com/javase/${javadoc.version}/docs/api
+                        </link>
+                    </links>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>${gpg-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

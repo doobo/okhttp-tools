@@ -6,7 +6,6 @@ import vip.ipav.okhttp.body.ResponseProgressBody;
 import vip.ipav.okhttp.callback.MyDownloadCallback;
 import vip.ipav.okhttp.response.DownloadResponseHandler;
 import java.io.File;
-import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -18,11 +17,25 @@ public class DownloadBuilder {
     private Object mTag;
     private Map<String, String> mHeaders;
 
-    private String mFileDir = "";        //文件dir
-    private String mFileName = "";       //文件名
-    private String mFilePath = "";       //文件路径 （如果设置该字段则上面2个就不需要）
+    /**
+     * 文件dir
+     */
+    private String mFileDir = "";
+    
+    /**
+     * 文件名
+     */
+    private String mFileName = "";
+    
+    /**
+     * 文件路径 （如果设置该字段则上面2个就不需要
+     */
+    private String mFilePath = "";
 
-    private Long mCompleteBytes = 0L;    //已经完成的字节数 用于断点续传
+    /**
+     * 已经完成的字节数 用于断点续传
+     */
+    private Long mCompleteBytes = 0L;
 
     public DownloadBuilder(OkHttpClientTools okHttpClientTools) {
         mOkHttpClientTools = okHttpClientTools;
@@ -106,7 +119,8 @@ public class DownloadBuilder {
     public DownloadBuilder setCompleteBytes(Long completeBytes) {
         if(completeBytes > 0L) {
             this.mCompleteBytes = completeBytes;
-            addHeader("RANGE", "bytes=" + completeBytes + "-");     //添加断点续传header
+            //添加断点续传header
+            addHeader("RANGE", "bytes=" + completeBytes + "-");
         }
         return this;
     }
@@ -136,18 +150,15 @@ public class DownloadBuilder {
             if (mTag != null) {
                 builder.tag(mTag);
             }
-
             Request request = builder.build();
 
             Call call = mOkHttpClientTools.getOkHttpClient().newBuilder()
-                    .addNetworkInterceptor(new Interceptor() {      //设置拦截器
-                        @Override
-                        public Response intercept(Chain chain) throws IOException {
-                            Response originalResponse = chain.proceed(chain.request());
-                            return originalResponse.newBuilder()
-                                    .body(new ResponseProgressBody(originalResponse.body(), downloadResponseHandler))
-                                    .build();
-                        }
+                    //设置拦截器
+                    .addNetworkInterceptor(chain -> {
+                        Response originalResponse = chain.proceed(chain.request());
+                        return originalResponse.newBuilder()
+                                .body(new ResponseProgressBody(originalResponse.body(), downloadResponseHandler))
+                                .build();
                     })
                     .build()
                     .newCall(request);

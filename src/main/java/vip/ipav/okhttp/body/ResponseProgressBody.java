@@ -49,9 +49,6 @@ public class ResponseProgressBody extends ResponseBody {
                 //这个的进度应该是读取response每次内容的进度，在写文件进度之前 所以暂时以写完文件的进度为准
                 long bytesRead = super.read(sink, byteCount);
                 totalBytesRead += ((bytesRead != -1) ? bytesRead : 0);
-//                if (mDownloadResponseHandler != null) {
-//                    mDownloadResponseHandler.onProgress(totalBytesRead, mResponseBody.contentLength());
-//                }
                 return bytesRead;
             }
         };

@@ -63,10 +63,6 @@ public class WsBuilder extends OkHttpRequestBuilderHasParam<WsBuilder> {
     }
 
     public String getUrl(){
-        if(!RegularUtils.isUrl(mUrl)){
-            throw new IllegalArgumentException("url is unqualified!");
-        }
-
         if (mParams != null && mParams.size() > 0) {
             mUrl = appendParams(mUrl, mParams);
         }

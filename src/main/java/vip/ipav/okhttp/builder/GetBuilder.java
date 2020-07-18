@@ -22,10 +22,6 @@ public class GetBuilder extends OkHttpRequestBuilderHasParam<GetBuilder> {
     @Override
     public void enqueue(final IResponseHandler responseHandler) {
         try {
-            if(!RegularUtils.isUrl(mUrl)){
-                throw new IllegalArgumentException("url is unqualified!");
-            }
-
             if (mParams != null && mParams.size() > 0) {
                 mUrl = appendParams(mUrl, mParams);
             }
@@ -54,9 +50,6 @@ public class GetBuilder extends OkHttpRequestBuilderHasParam<GetBuilder> {
      * @return
      */
     public Response execute() {
-        if(!RegularUtils.isUrl(mUrl)){
-            throw new IllegalArgumentException("url is unqualified!");
-        }
         if (mParams != null && mParams.size() > 0) {
             mUrl = appendParams(mUrl, mParams);
         }

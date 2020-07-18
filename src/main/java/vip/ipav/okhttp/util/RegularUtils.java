@@ -5,26 +5,13 @@ import java.util.regex.Pattern;
 
 public class RegularUtils {
     /**
-     * URL检查<br>
-     * <br>
-     * @param url     要检查的字符串<br>
-     * @return boolean   返回检查结果<br>
+     * URL检查
+     * @param url 要检查的字符串
+     * @return boolean 返回检查结果
      */
+    @Deprecated
     public static boolean isUrl(String url) {
-        if (url ==  null ){
-            return   false ;
-        }
-        String regEx =  "^(http|https|ftp|ws|wss)\\://([a-zA-Z0-9\\.\\-]+(\\:[a-zA-"
-                +  "Z0-9\\.&%\\$\\-]+)*@)?((25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{"
-                +  "2}|[1-9]{1}[0-9]{1}|[1-9])\\.(25[0-5]|2[0-4][0-9]|[0-1]{1}"
-                +  "[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\\.(25[0-5]|2[0-4][0-9]|"
-                +  "[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\\.(25[0-5]|2[0-"
-                +  "4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9])|([a-zA-Z0"
-                +  "-9\\-]+\\.)*[a-zA-Z0-9\\-]+\\.[a-zA-Z]{2,4})(\\:[0-9]+)?"
-                +  "[a-zA-Z0-9\\.\\,\\?\\'\\\\/\\+&%\\$\\=~_\\-@\\/\\;\\#\\!]*$" ;
-        Pattern p = Pattern.compile(regEx);
-        Matcher matcher = p.matcher(url);
-        return  matcher.matches();
+        return true;
     }
 
     /**

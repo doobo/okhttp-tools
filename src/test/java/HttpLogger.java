@@ -1,10 +1,8 @@
-package vip.ipav.okhttp.util;
-
 import okhttp3.logging.HttpLoggingInterceptor;
 
 /**
  * 网络日志拦截器
- * com.squareup.okhttp3:logging-interceptor:3.1.0
+ * com.squareup.okhttp3:logging-interceptor
  */
 public class HttpLogger implements HttpLoggingInterceptor.Logger {
 

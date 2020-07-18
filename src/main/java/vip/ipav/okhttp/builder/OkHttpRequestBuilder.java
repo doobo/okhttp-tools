@@ -78,7 +78,11 @@ public abstract class OkHttpRequestBuilder<T extends OkHttpRequestBuilder> {
         return (T) this;
     }
 
-    //append headers into builder
+    /**
+     * append headers into builder
+     * @param builder
+     * @param headers
+     */
     protected void appendHeaders(Request.Builder builder, Map<String, String> headers) {
         Headers.Builder headerBuilder = new Headers.Builder();
         if (headers == null || headers.isEmpty()) return;
@@ -89,7 +93,12 @@ public abstract class OkHttpRequestBuilder<T extends OkHttpRequestBuilder> {
         builder.headers(headerBuilder.build());
     }
 
-    //append params to url
+    /**
+     * append params to url
+     * @param url
+     * @param params
+     * @return
+     */
     public String appendParams(String url, Map<String, String> params) {
         StringBuilder sb = new StringBuilder();
         if(RegularUtils.hasWenHao(url)){
