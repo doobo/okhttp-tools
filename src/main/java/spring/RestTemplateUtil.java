@@ -17,6 +17,7 @@ import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * restTemplate公共请求方法
@@ -38,11 +39,15 @@ public class RestTemplateUtil {
 			byte[] body = StreamUtils.copyToByteArray(request.getInputStream());
             return new HttpEntity<>(body, getAuthorization(request));
         } catch (Exception e) {
-            throw new RuntimeException();
+            log.warn("RestTemplateUtilError", e);
+            return new HttpEntity<>(null, getAuthorization(request));
         }
     }
 
-    public static <T> HttpEntity<T> param(HttpServletRequest request, T body) {
+    public static HttpEntity<Object> param(HttpServletRequest request, Object body) {
+        if(Objects.isNull(body)){
+            return param(request);
+        }
         return new HttpEntity<>(body, getAuthorization(request));
     }
 
@@ -70,7 +75,7 @@ public class RestTemplateUtil {
      */
     public static <T> T getExchange(String url, HttpServletRequest request, ParameterizedTypeReference<T> responseType) {
         return RestTemplateUtil.getInstance().exchange(param(request, url)
-                , HttpMethod.GET, new HttpEntity<>(null, getAuthorization(request))
+                , HttpMethod.GET, param(null, getAuthorization(request))
                 , responseType).getBody();
     }
 
@@ -125,7 +130,20 @@ public class RestTemplateUtil {
      */
     public static <T> T postExchange(String url, HttpServletRequest request, Object data, ParameterizedTypeReference<T> responseType) {
         return RestTemplateUtil.getInstance().exchange(param(request, url)
-                , HttpMethod.POST, new HttpEntity<>(data, getAuthorization(request))
+                , HttpMethod.POST, param(request, data)
+                , responseType).getBody();
+    }
+
+    /**
+     * url里面不带参数
+     * @param url
+     * @param request
+     * @param responseType
+     * @return
+     */
+    public static <T> T postExchange(String url, HttpServletRequest request, ParameterizedTypeReference<T> responseType) {
+        return RestTemplateUtil.getInstance().exchange(param(request, url)
+                , HttpMethod.POST, param(request)
                 , responseType).getBody();
     }
 
@@ -139,7 +157,7 @@ public class RestTemplateUtil {
      */
     public static <T> T postExchange(String url, HttpServletRequest request, Object data, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
         return RestTemplateUtil.getInstance().exchange(url
-                , HttpMethod.POST, new HttpEntity<>(data, getAuthorization(request))
+                , HttpMethod.POST, param(request, data)
                 , responseType, uriVariables).getBody();
     }
 
@@ -181,7 +199,7 @@ public class RestTemplateUtil {
      */
     public static <T> T putExchange(String url, HttpServletRequest request, Object data, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
         return RestTemplateUtil.getInstance().exchange(url
-                , HttpMethod.PUT, new HttpEntity<>(data, getAuthorization(request))
+                , HttpMethod.PUT, param(request, data)
                 , responseType, uriVariables).getBody();
     }
 
@@ -209,7 +227,7 @@ public class RestTemplateUtil {
      */
     public static <T> T delExchange(String url, HttpServletRequest request, Object data, ParameterizedTypeReference<T> responseType) {
         return RestTemplateUtil.getInstance().exchange(param(request, url)
-                , HttpMethod.DELETE, new HttpEntity<>(data, getAuthorization(request))
+                , HttpMethod.DELETE, param(request, data)
                 , responseType).getBody();
     }
 
@@ -223,7 +241,7 @@ public class RestTemplateUtil {
      */
     public static <T> T delExchange(String url, HttpServletRequest request, Object data, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
         return RestTemplateUtil.getInstance().exchange(url
-                , HttpMethod.DELETE, new HttpEntity<>(data, getAuthorization(request))
+                , HttpMethod.DELETE, param(request, data)
                 , responseType, uriVariables).getBody();
     }
 
