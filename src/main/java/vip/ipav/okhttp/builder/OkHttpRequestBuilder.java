@@ -11,6 +11,8 @@ import java.net.URLEncoder;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 @SuppressWarnings("unchecked")
 public abstract class OkHttpRequestBuilder<T extends OkHttpRequestBuilder> {
     protected String mUrl;
@@ -116,6 +118,38 @@ public abstract class OkHttpRequestBuilder<T extends OkHttpRequestBuilder> {
             }
         }
 
+        sb = sb.deleteCharAt(sb.length() - 1);
+        return sb.toString();
+    }
+
+    /**
+     * append params to url
+     * @param url
+     * @param params
+     * @return
+     */
+    public String appendParamArr(String url, Map<String, String[]> params) {
+        StringBuilder sb = new StringBuilder();
+        if(RegularUtils.hasWenHao(url)){
+            sb.append(url+"&");
+        }else{
+            sb.append(url + "?");
+        }
+        if (params != null && !params.isEmpty()) {
+            for (String key : params.keySet()) {
+                try {
+                    String[] ss = params.get(key);
+                    if(ss == null || ss.length == 0){
+                        continue;
+                    }
+                    for(String st : ss){
+                        sb.append(key).append("=").append(URLEncoder.encode(st,UTF_8.name())).append("&");
+                    }
+                } catch (UnsupportedEncodingException e) {
+                    sb.append(key).append("=").append(params.get(key)).append("&");
+                }
+            }
+        }
         sb = sb.deleteCharAt(sb.length() - 1);
         return sb.toString();
     }

@@ -92,10 +92,11 @@ public class HttpThread {
 
     @Test
     public void testSpeedUrl(){
-        String url = "http://www.baidu.com/index.html?m=uuid&";
-        Map<String, String> params = new HashMap<>();
-        params.put("abc","123");
-        System.out.println(OkHttpClientTools.getInstance().head().appendParams(url,params));
+        String url = "http://www.baidu.com/index.html?a=1";
+        Map<String, String[]> params = new HashMap<>();
+        params.put("abc", new String[]{"11","22"});
+        params.put("mm", new String[]{"a"});
+        System.out.println(OkHttpClientTools.getInstance().head().appendParamArr(url,params));
     }
 
     @Test

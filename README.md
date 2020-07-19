@@ -3,7 +3,7 @@
 [![License](https://img.shields.io/badge/license-Apache%202-green.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 
 > 对Okhttp3进行二次封装,对外提供了POST请求、GET请求、PATCH请求、PUT请求、DELETE请求、上传文件、下载文件、取消请求、Ws/Wss请求、Raw/Json/Gson返回、后台下载管理等功能.
-* 如果异步使用相关JSON解析器，请主动添加该包，默认不会添加，以免引起不必要的引入,去掉对中文header内容的判断，可以在header里面添加值
+* 如果异步使用相关JSON解析器，请主动添加该包，默认不会添加，以免引起不必要的引入,去掉对中文header内容的判断，可以在header里面添加中文值
 
 ## 如何添加
 ```
@@ -207,7 +207,6 @@
                     public void saveFromResponse(HttpUrl httpUrl, List<Cookie> list) {
                         System.out.println(list);
                     }
-
                     @Override
                     public List<Cookie> loadForRequest(HttpUrl httpUrl) {
                         System.out.println(httpUrl.pathSegments());
@@ -277,6 +276,125 @@
         Map<String, String> params = new HashMap<>();
         params.put("abc","123");
         System.out.println(OkHttpClientTools.getInstance().head().appendParams(url,params));
+    }
+```
+
+## 添加springboot的restTemplate模板支持,GET/POST/PUT/DELETE/HEAD/TRACE/PATCH/OPTIONS
+
+### 在springboot项目里面额外引用
+```xml
+<dependency>
+    <groupId>org.apache.httpcomponents</groupId>
+    <artifactId>httpclient</artifactId>
+    <version>4.5.6</version>
+</dependency>
+```
+
+### restTemplate使用实例
+```
+    //直接使用
+    @Test
+    public void testGet(){
+        String str = RestTemplateUtil.getExchange("https://hao.360.cn/?src={}&ls={}"
+        , new ParameterizedTypeReference<String>(){}, "lm", "n2a27c3f091");
+        System.out.println(str);
+    }
+    
+    //配合spring做代理转发,如果想自动带参数过去,需要配置扫描路径：@ComponentScan("spring.config")
+    @ApiOperation(value = "办件作废申请")
+    @PostMapping("/Affairs/ApplyDiscardAffairsInfo")
+    @HasPermission(value = {PermissionType.NORMAL_ROLE, PermissionType.ADMIN_ROLE})
+    public ResultTemplate<List<Boolean>> applyDiscardAffairsInfoPost(HttpServletRequest request,
+        @RequestBody DiscardServiceModel body) {
+        return RestTemplateUtil.postExchange(host + request.getRequestURI(), request
+                ,new ParameterizedTypeReference<ResultTemplate<List<Boolean>>>() {});
+    }
+    
+    //文件下载
+    @ApiOperation(value = "Pdf打印")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "affairInfoCode", dataType = "string", paramType = "query")
+    })
+    @PostMapping("/GetPdfFile")
+    public void getPdfFilePost(HttpServletRequest request, HttpServletResponse response) {
+        Resource resource = RestTemplateUtil.postExchange(PdfUrl.getPdfFilePost, request,ApiType.API_CENTRE, null
+                ,new ParameterizedTypeReference<Resource>() {});
+        RestTemplateUtil.downloadFile(response, resource);
+    }
+    
+    //如果想要自定义httpUtil的参数,如日志监控等,BasicParams继承它，并暴露给Bean容器
+    @Bean
+    public HttpUtils httpUtils(){
+        HttpUtils httpUtils = new HttpUtils();
+        HttpUtils.basicParams(basicParams);
+        return httpUtils;
+    }
+    
+    //ssl和链路追踪配置
+    /**
+     * 配置 span 收集器
+     * @return
+     */
+    @Bean
+    public SpanCollector spanCollector() {
+        Config config = Config.builder()
+                .connectTimeout(connecTimeout)
+                .compressionEnabled(compressionEnabled)
+                .flushInterval(flushInterval)
+                .readTimeout(readTimeout)
+                .build();
+
+        return HttpSpanCollector.create(url, config, new EmptySpanCollectorMetricsHandler());
+    }
+
+    /**
+     * 配置采集率
+     * @param spanCollector
+     * @return
+     */
+    @Bean
+    public Brave brave(SpanCollector spanCollector) {
+        Builder builder = new Builder(serviceName);
+        builder.spanCollector(spanCollector)
+                .traceSampler(Sampler.create(samplerRate))
+                .build();
+        return builder.build();
+    }
+    
+    @Bean
+    public CloseableHttpClient httpClient(Brave brave) {
+        CloseableHttpClient httpclient = HttpClients.custom()
+                .addInterceptorFirst(new BraveHttpRequestInterceptor(brave.clientRequestInterceptor(),
+                        new DefaultSpanNameProvider()))
+                .addInterceptorFirst(new BraveHttpResponseInterceptor(brave.clientResponseInterceptor()))
+                .setMaxConnTotal(ComProperties.getTotal()).setMaxConnPerRoute(ComProperties.getRoute())
+                .build();
+        return httpclient;
+    }
+
+    /**
+     * 配置zk拦截器
+     * @param httpClient
+     * @return
+     */
+    @Bean
+    public RestTemplateUtil restTemplateUtil(CloseableHttpClient httpClient){
+        RestTemplateUtil restTemplateUtil = new RestTemplateUtil();
+        restTemplateUtil.setHttpClient(httpClient);
+        return restTemplateUtil;
+    }
+    
+    /**
+     * 设置server的（服务端收到请求和服务端完成处理，并将结果发送给客户端）过滤器
+     * @Param:
+     * @return: 过滤器
+     * 不知道有用没,也许可以去掉
+     */
+    @Bean
+    public BraveServletFilter braveServletFilter(Brave brave) {
+        BraveServletFilter filter = new BraveServletFilter(brave.serverRequestInterceptor(),
+                brave.serverResponseInterceptor(), new DefaultSpanNameProvider());
+        return filter;
     }
 ```
 
