@@ -330,7 +330,7 @@
         return httpUtils;
     }
     
-    //ssl和链路追踪配置
+    //链路追踪配置
     /**
      * 配置 span 收集器
      * @return
@@ -395,6 +395,17 @@
         BraveServletFilter filter = new BraveServletFilter(brave.serverRequestInterceptor(),
                 brave.serverResponseInterceptor(), new DefaultSpanNameProvider());
         return filter;
+    }
+    
+    //配置restTemplate
+    private static RestTemplate restTemplate() {
+        HttpComponentsClientHttpRequestFactory clientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
+        clientHttpRequestFactory.setConnectionRequestTimeout(ComProperties.getRequestTimeout());
+        clientHttpRequestFactory.setConnectTimeout(ComProperties.getConnectTimeout());
+        clientHttpRequestFactory.setReadTimeout(ComProperties.getReadTimeout());
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.setRequestFactory(clientHttpRequestFactory);
+        return restTemplate;
     }
 ```
 
