@@ -9,6 +9,10 @@
 #git remote add gitee git@gitee.com:doobo/OkHttpTools.git
 #git push gitee master --force
 
+#git tag -d v1.1
+#git push origin :v1.1
+
+
 mvn clean
 mvn release:prepare
 mvn release:perform
