@@ -2,7 +2,6 @@ package spring;
 
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustStrategy;
-import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
@@ -34,23 +33,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * restTemplate工具,拦截request和response
- * RestTemplate restTemplate = HttpUtils.createRestTemplate();
- * Object obj = restTemplate.getForEntity("https://baidu.com", Object.class);
- *
- * <dependency>
- *   <groupId>org.springframework.boot</groupId>
- *   <artifactId>spring-boot-starter-web</artifactId>
- * </dependency>
- * <dependency>
- *  <groupId>org.apache.httpcomponents</groupId>
- *  <artifactId>httpclient</artifactId>
- *  <version>4.5.6</version>
- *</dependency>
- *
- * @author qpc
- * @javax.annotation.Resource(name = "RestTemplate2")
- * protected RestTemplate restTemplate;
+ * restTemplate工具
  */
 public class HttpUtils {
 
