@@ -17,7 +17,6 @@
   <dependency>
      <groupId>com.squareup.okhttp3</groupId>
      <artifactId>logging-interceptor</artifactId>
-     <optional>true</optional>
      <version>3.14.9</version>
   </dependency>
 ```
