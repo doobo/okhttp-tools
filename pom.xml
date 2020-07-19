@@ -5,7 +5,7 @@
     <groupId>com.github.doobo</groupId>
     <artifactId>okhttp-tools</artifactId>
     <packaging>jar</packaging>
-    <version>1.2-SNAPSHOT</version>
+    <version>1.1</version>
 
     <name>OkHttpTools</name>
     <description>OKHttp3的简单封装，链式调用</description>
@@ -20,7 +20,7 @@
     </licenses>
 
     <scm>
-        <tag>master</tag>
+        <tag>v1.1</tag>
         <url>scm:https://github.com/doobo/OkHttpTools</url>
         <connection>scm:git:git@github.com:doobo/OkHttpTools.git</connection>
         <developerConnection>scm:git:git@github.com:doobo/OkHttpTools.git</developerConnection>
