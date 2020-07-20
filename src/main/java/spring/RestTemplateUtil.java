@@ -16,8 +16,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Enumeration;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * restTemplate公共请求方法
@@ -45,9 +45,6 @@ public class RestTemplateUtil {
     }
 
     public static HttpEntity<Object> param(HttpServletRequest request, Object body) {
-        if(Objects.isNull(body)){
-            return param(request);
-        }
         return new HttpEntity<>(body, getAuthorization(request));
     }
 
@@ -58,11 +55,14 @@ public class RestTemplateUtil {
 
     private static HttpHeaders getAuthorization(HttpServletRequest request) {
         HttpHeaders requestHeaders = new HttpHeaders();
-        requestHeaders.add("ContentType", request.getHeader("ContentType"));
-        requestHeaders.add("Content-Type", request.getHeader("Content-Type"));
-        requestHeaders.add("Accept", request.getHeader("Accept"));
-        requestHeaders.add("Data-Language", request.getHeader("Data-Language"));
-        requestHeaders.add("Authorization", request.getHeader("Authorization"));
+        Enumeration<String> em = request.getHeaderNames();
+        if(em != null){
+            String name;
+            while (em.hasMoreElements()){
+                name = em.nextElement();
+                requestHeaders.add(name, request.getHeader(name));
+            }
+        }
         return requestHeaders;
     }
 
