@@ -71,7 +71,6 @@ public class RestTemplateUtil {
      * @param url
      * @param request
      * @param responseType
-     * @return
      */
     public static <T> T getExchange(String url, HttpServletRequest request, ParameterizedTypeReference<T> responseType) {
         return RestTemplateUtil.getInstance().exchange(param(request, url)
@@ -85,7 +84,6 @@ public class RestTemplateUtil {
      * @param request
      * @param responseType
      * @param uriVariables
-     * @return
      */
     public static <T> T getExchange(String url, HttpServletRequest request, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
         return RestTemplateUtil.getInstance().exchange(url
@@ -98,7 +96,6 @@ public class RestTemplateUtil {
      * @param url
      * @param responseType
      * @param uriVariables
-     * @return
      */
     public static <T> T getExchange(String url, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
         return RestTemplateUtil.getInstance().exchange(url
@@ -112,7 +109,6 @@ public class RestTemplateUtil {
      * @param data
      * @param responseType
      * @param uriVariables
-     * @return
      */
     public static <T> T getExchange(String url, Object data, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
         return RestTemplateUtil.getInstance().exchange(url
@@ -126,7 +122,6 @@ public class RestTemplateUtil {
      * @param request
      * @param data
      * @param responseType
-     * @return
      */
     public static <T> T postExchange(String url, HttpServletRequest request, Object data, ParameterizedTypeReference<T> responseType) {
         return RestTemplateUtil.getInstance().exchange(param(request, url)
@@ -139,7 +134,6 @@ public class RestTemplateUtil {
      * @param url
      * @param request
      * @param responseType
-     * @return
      */
     public static <T> T postExchange(String url, HttpServletRequest request, ParameterizedTypeReference<T> responseType) {
         return RestTemplateUtil.getInstance().exchange(param(request, url)
@@ -153,7 +147,6 @@ public class RestTemplateUtil {
      * @param request
      * @param responseType
      * @param uriVariables
-     * @return
      */
     public static <T> T postExchange(String url, HttpServletRequest request, Object data, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
         return RestTemplateUtil.getInstance().exchange(url
@@ -167,7 +160,6 @@ public class RestTemplateUtil {
      * @param data
      * @param responseType
      * @param uriVariables
-     * @return
      */
     public static <T> T postExchange(String url, String data, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
         return RestTemplateUtil.getInstance().exchange(url
@@ -181,7 +173,6 @@ public class RestTemplateUtil {
      * @param request
      * @param data
      * @param responseType
-     * @return
      */
     public static <T> T putExchange(String url, HttpServletRequest request, Object data, ParameterizedTypeReference<T> responseType) {
         return RestTemplateUtil.getInstance().exchange(param(request, url)
@@ -195,7 +186,6 @@ public class RestTemplateUtil {
      * @param request
      * @param responseType
      * @param uriVariables
-     * @return
      */
     public static <T> T putExchange(String url, HttpServletRequest request, Object data, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
         return RestTemplateUtil.getInstance().exchange(url
@@ -209,7 +199,6 @@ public class RestTemplateUtil {
      * @param data
      * @param responseType
      * @param uriVariables
-     * @return
      */
     public static <T> T putExchange(String url, String data, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
         return RestTemplateUtil.getInstance().exchange(url
@@ -237,7 +226,6 @@ public class RestTemplateUtil {
      * @param request
      * @param responseType
      * @param uriVariables
-     * @return
      */
     public static <T> T delExchange(String url, HttpServletRequest request, Object data, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
         return RestTemplateUtil.getInstance().exchange(url
@@ -251,7 +239,6 @@ public class RestTemplateUtil {
      * @param data
      * @param responseType
      * @param uriVariables
-     * @return
      */
     public static <T> T delExchange(String url, String data, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
         return RestTemplateUtil.getInstance().exchange(url
@@ -265,7 +252,6 @@ public class RestTemplateUtil {
      * @param data
      * @param responseType
      * @param uriVariables
-     * @return
      */
     public static <T> T headExchange(String url, String data, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
         return RestTemplateUtil.getInstance().exchange(url
@@ -279,7 +265,6 @@ public class RestTemplateUtil {
      * @param data
      * @param responseType
      * @param uriVariables
-     * @return
      */
     public static <T> T traceExchange(String url, String data, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
         return RestTemplateUtil.getInstance().exchange(url
@@ -293,7 +278,6 @@ public class RestTemplateUtil {
      * @param data
      * @param responseType
      * @param uriVariables
-     * @return
      */
     public static <T> T patchExchange(String url, String data, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
         return RestTemplateUtil.getInstance().exchange(url
@@ -307,7 +291,6 @@ public class RestTemplateUtil {
      * @param data
      * @param responseType
      * @param uriVariables
-     * @return
      */
     public static <T> T optionsExchange(String url, String data, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
         return RestTemplateUtil.getInstance().exchange(url
