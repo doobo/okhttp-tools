@@ -86,7 +86,7 @@ public class RestTemplateUtil {
      * @param uriVariables
      */
     public static <T> T getExchange(String url, HttpServletRequest request, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
-        return RestTemplateUtil.getInstance().exchange(url
+        return RestTemplateUtil.getInstance().exchange(param(request, url)
                 , HttpMethod.GET, new HttpEntity<>(null, getAuthorization(request))
                 , responseType, uriVariables).getBody();
     }
@@ -149,7 +149,7 @@ public class RestTemplateUtil {
      * @param uriVariables
      */
     public static <T> T postExchange(String url, HttpServletRequest request, Object data, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
-        return RestTemplateUtil.getInstance().exchange(url
+        return RestTemplateUtil.getInstance().exchange(param(request, url)
                 , HttpMethod.POST, param(request, data)
                 , responseType, uriVariables).getBody();
     }
@@ -188,7 +188,7 @@ public class RestTemplateUtil {
      * @param uriVariables
      */
     public static <T> T putExchange(String url, HttpServletRequest request, Object data, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
-        return RestTemplateUtil.getInstance().exchange(url
+        return RestTemplateUtil.getInstance().exchange(param(request, url)
                 , HttpMethod.PUT, param(request, data)
                 , responseType, uriVariables).getBody();
     }
@@ -228,7 +228,7 @@ public class RestTemplateUtil {
      * @param uriVariables
      */
     public static <T> T delExchange(String url, HttpServletRequest request, Object data, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
-        return RestTemplateUtil.getInstance().exchange(url
+        return RestTemplateUtil.getInstance().exchange(param(request, url)
                 , HttpMethod.DELETE, param(request, data)
                 , responseType, uriVariables).getBody();
     }
