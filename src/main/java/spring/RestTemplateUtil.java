@@ -3,21 +3,23 @@ package spring;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.util.StreamUtils;
+import org.springframework.http.*;
+import org.springframework.util.*;
 import org.springframework.web.client.RestTemplate;
-import vip.ipav.okhttp.OkHttpClientTools;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedInputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Enumeration;
-import java.util.Map;
+import java.io.*;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * restTemplate公共请求方法
@@ -34,7 +36,7 @@ public class RestTemplateUtil {
 		return SignRestTemplate.INSTANCE;
     }
 
-    public static HttpEntity<Object> param(HttpServletRequest request) {
+    public static HttpEntity<Object> paramBody(HttpServletRequest request) {
         try {
 			byte[] body = StreamUtils.copyToByteArray(request.getInputStream());
             return new HttpEntity<>(body, getAuthorization(request));
@@ -44,15 +46,18 @@ public class RestTemplateUtil {
         }
     }
 
-    public static HttpEntity<Object> param(HttpServletRequest request, Object body) {
+    public static HttpEntity<Object> paramBody(HttpServletRequest request, Object body) {
         return new HttpEntity<>(body, getAuthorization(request));
     }
 
     private static String param(HttpServletRequest request, String url) {
-        Map<String, String[]> param = request.getParameterMap();
-        return OkHttpClientTools.getInstance().head().appendParamArr(url,param);
+        return paramGet(request, url);
     }
 
+    /**
+     * 获取request里面的头部信息
+     * @param request
+     */
     private static HttpHeaders getAuthorization(HttpServletRequest request) {
         HttpHeaders requestHeaders = new HttpHeaders();
         Enumeration<String> em = request.getHeaderNames();
@@ -74,7 +79,7 @@ public class RestTemplateUtil {
      */
     public static <T> T getExchange(String url, HttpServletRequest request, ParameterizedTypeReference<T> responseType) {
         return RestTemplateUtil.getInstance().exchange(param(request, url)
-                , HttpMethod.GET, param(null, getAuthorization(request))
+                , HttpMethod.GET, paramBody(null, getAuthorization(request))
                 , responseType).getBody();
     }
 
@@ -92,6 +97,20 @@ public class RestTemplateUtil {
     }
 
     /**
+     * 自定义头部信息
+     * @param url
+     * @param request
+     * @param headers
+     * @param cls
+     * @param uriVariables
+     * @param <T>
+     */
+    public static <T> ResponseEntity<T> getExchange(String url, HttpServletRequest request, HttpHeaders headers, Class<T> cls, Object... uriVariables) {
+        return RestTemplateUtil.getInstance().exchange(paramGet(request, url), HttpMethod.GET
+                , new HttpEntity<>(null, headers), cls, uriVariables);
+    }
+
+    /**
      * 原生http请求
      * @param url
      * @param responseType
@@ -102,18 +121,18 @@ public class RestTemplateUtil {
                 , HttpMethod.GET, new HttpEntity<>(null)
                 , responseType, uriVariables).getBody();
     }
-
+    
     /**
-     * 原生http请求
+     * 自定义头部信息
      * @param url
-     * @param data
-     * @param responseType
+     * @param headers
+     * @param cls
      * @param uriVariables
+     * @param <T>
      */
-    public static <T> T getExchange(String url, Object data, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
-        return RestTemplateUtil.getInstance().exchange(url
-                , HttpMethod.GET, new HttpEntity<>(data)
-                , responseType, uriVariables).getBody();
+    public static <T> ResponseEntity<T> getExchange(String url, HttpHeaders headers, Class<T> cls, Object... uriVariables) {
+        return RestTemplateUtil.getInstance().exchange(url, HttpMethod.GET
+                , new HttpEntity<>(null, headers), cls, uriVariables);
     }
 
     /**
@@ -125,7 +144,7 @@ public class RestTemplateUtil {
      */
     public static <T> T postExchange(String url, HttpServletRequest request, Object data, ParameterizedTypeReference<T> responseType) {
         return RestTemplateUtil.getInstance().exchange(param(request, url)
-                , HttpMethod.POST, param(request, data)
+                , HttpMethod.POST, paramBody(request, data)
                 , responseType).getBody();
     }
 
@@ -137,7 +156,7 @@ public class RestTemplateUtil {
      */
     public static <T> T postExchange(String url, HttpServletRequest request, ParameterizedTypeReference<T> responseType) {
         return RestTemplateUtil.getInstance().exchange(param(request, url)
-                , HttpMethod.POST, param(request)
+                , HttpMethod.POST, paramBody(request)
                 , responseType).getBody();
     }
 
@@ -150,7 +169,7 @@ public class RestTemplateUtil {
      */
     public static <T> T postExchange(String url, HttpServletRequest request, Object data, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
         return RestTemplateUtil.getInstance().exchange(param(request, url)
-                , HttpMethod.POST, param(request, data)
+                , HttpMethod.POST, paramBody(request, data)
                 , responseType, uriVariables).getBody();
     }
 
@@ -189,7 +208,7 @@ public class RestTemplateUtil {
      */
     public static <T> T putExchange(String url, HttpServletRequest request, Object data, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
         return RestTemplateUtil.getInstance().exchange(param(request, url)
-                , HttpMethod.PUT, param(request, data)
+                , HttpMethod.PUT, paramBody(request, data)
                 , responseType, uriVariables).getBody();
     }
 
@@ -216,7 +235,7 @@ public class RestTemplateUtil {
      */
     public static <T> T delExchange(String url, HttpServletRequest request, Object data, ParameterizedTypeReference<T> responseType) {
         return RestTemplateUtil.getInstance().exchange(param(request, url)
-                , HttpMethod.DELETE, param(request, data)
+                , HttpMethod.DELETE, paramBody(request, data)
                 , responseType).getBody();
     }
 
@@ -229,7 +248,7 @@ public class RestTemplateUtil {
      */
     public static <T> T delExchange(String url, HttpServletRequest request, Object data, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
         return RestTemplateUtil.getInstance().exchange(param(request, url)
-                , HttpMethod.DELETE, param(request, data)
+                , HttpMethod.DELETE, paramBody(request, data)
                 , responseType, uriVariables).getBody();
     }
 
@@ -297,15 +316,219 @@ public class RestTemplateUtil {
                 , HttpMethod.OPTIONS, new HttpEntity<>(data)
                 , responseType, uriVariables).getBody();
     }
+
+    public static <T> T postMultipartFile(String url, HttpServletRequest request ,Map<String, Object> body, ParameterizedTypeReference<T> reference, Object... uriVariables) {
+        HttpHeaders headers = getAuthorization(request);
+        headers.remove("Content-Type");
+        headers.remove("ContentType");
+        headers.setContentType(MediaType.parseMediaType("multipart/form-data;charset=UTF-8"));
+        if(body == null || body.isEmpty()){
+            return RestTemplateUtil.getInstance().exchange(param(request,url), HttpMethod.POST, new HttpEntity<>(body, headers), reference, uriVariables).getBody();
+        }
+        MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
+        String tempPath = "logs";
+        // 保存临时文件
+        List<String> tempList = new ArrayList<>();
+        Object obj;
+        for(String key : body.keySet()){
+            obj = body.get(key);
+            try {
+                tempPath = createDir(tempPath);
+                if(obj instanceof MultipartFile){
+                    MultipartFile file = (MultipartFile) obj;
+                    String tempFilePath = tempPath + File.separator + file.getOriginalFilename();
+                    FileCopyUtils.copy(file.getInputStream(), new FileOutputStream(tempFilePath));
+                    tempList.add(tempFilePath);
+                    FileSystemResource resource = new FileSystemResource(tempFilePath);
+                    param.add(key, resource);
+                    headers = covertFileHeaders(headers, param, request);
+                }else if(obj instanceof MultipartFile[]){
+                    MultipartFile[] files = (MultipartFile[]) obj;
+                    for(MultipartFile file : files){
+                        String tempFilePath = tempPath + File.separator + file.getOriginalFilename();
+                        FileCopyUtils.copy(file.getInputStream(), new FileOutputStream(tempFilePath));
+                        tempList.add(tempFilePath);
+                        FileSystemResource resource = new FileSystemResource(tempFilePath);
+                        param.add(key, resource);
+                    }
+                    headers = covertFileHeaders(headers, param, request);
+                }else{
+                    param.add(key, obj);
+                }
+            } catch (Exception e) {
+                log.error("postMultipartFileError", e);
+            }
+        }
+        try {
+            return RestTemplateUtil.getInstance().exchange(paramGet(request,url),
+                    HttpMethod.POST, new HttpEntity<>(param, headers), reference, uriVariables).getBody();
+        } finally {
+            deleteLocalTempFiles(tempList);
+        }
+    }
+
+    /**
+     * 组装文件里面自带的file属性
+     * @param headers
+     * @param map
+     */
+    public static HttpHeaders covertFileHeaders(HttpHeaders headers, MultiValueMap<String, Object> map, HttpServletRequest request){
+        headers = headers == null?new HttpHeaders():headers;
+        if(map == null || map.isEmpty()){
+            return headers;
+        }
+        String tmp;
+        for(String item : map.keySet()){
+            tmp = request.getHeader(item);
+            if(tmp != null && tmp.isEmpty()){
+                headers.add(item, tmp);
+            }
+        }
+        return headers;
+    }
+
+    /**
+     * 创建目录
+     * @param tempPath
+     * @throws IOException
+     */
+    private static String createDir(String tempPath) throws IOException {
+        File file = new File(tempPath);
+        if (!file.exists() && file.mkdirs()) {
+            log.info("create {} dir success.", tempPath);
+        }
+        return file.getCanonicalPath();
+    }
+
+    /**
+     * 删除临时文件
+     * @param tempList
+     */
+    private static void deleteLocalTempFiles(List<String> tempList) {
+        if (!CollectionUtils.isEmpty(tempList)) {
+            for (String fileName : tempList) {
+                File file = new File(fileName);
+                Path path = file.toPath();
+                try {
+                    Files.delete(path);
+                } catch (IOException e) {
+                    log.info("deleteLocalTempFilesError", e);
+                }
+            }
+        }
+    }
+
+    /**
+     * 组装Get里面的参数
+     * @param request
+     * @param url
+     */
+    private static String paramGet(HttpServletRequest request, String url) {
+        if(url == null || url.isEmpty()){
+            return "";
+        }
+        if(request.getQueryString() == null || request.getQueryString().isEmpty()){
+            return url;
+        }
+        url = url.contains("?")?(url + "&"):(url+"?");
+        return url + getQueryString(request.getQueryString());
+    }
+
+    public static MultiValueMap<String, String> stringToMap(String str){
+        //判断str是否有值
+        if (null == str || "".equals(str)){
+            return null;
+        }
+        //根据&截取
+        String[] strings = str.split("&");
+        MultiValueMap<String,String> map = new LinkedMultiValueMap<String, String>();
+        //循环加入map
+        for (int i = 0 ; i < strings.length ; i++){
+            String[] strArray = strings[i].split("=");
+            map.add(strArray[0] , strArray[1]);
+        }
+        return map;
+    }
+
+    /**
+     * 获取查询字符串
+     * @param str
+     */
+    public static String getQueryString(String str) {
+        if ( str == null ||  str.isEmpty()){
+            return "";
+        }
+        log.debug(str);
+        MultiValueMap<String, String> map = stringToMap(str);
+        return multiValueMapToUrl(map);
+    }
+
+    /**
+     * 组装Get参数
+     * @param map
+     */
+    public static String multiValueMapToUrl(MultiValueMap<String, String> map) {
+        if(map == null || map.isEmpty()){
+            return "";
+        }
+        Map<String,String[]> rMap = new HashMap<>();
+        map.keySet().stream().filter(Objects::nonNull)
+                .forEach(m->{
+                    List<String> tmp = map.get(m);
+                    if(tmp != null){
+                        rMap.put(m, tmp.toArray(new String[0]));
+                    }
+                });
+        return getMapArrToString(rMap);
+    }
+
+    /**
+     * 字段排序,并编码拼接字符串
+     * @param map
+     */
+    public static String getMapArrToString(Map<String, String[]> map) {
+        if(map == null || map.isEmpty()){
+            return "";
+        }
+        Set<String> keySet = map.keySet();
+        String[] keyArray = keySet.toArray(new String[0]);
+        Arrays.sort(keyArray);
+        StringBuilder sb = new StringBuilder();
+        String key;
+        String[] ss;
+        for (String s : keyArray) {
+            key = s;
+            ss = map.get(key);
+            if (ss == null || ss.length == 0) {
+                continue;
+            }
+            //同名参数,再对值排序
+            Arrays.sort(ss);
+            for (String st : ss) {
+                if (st != null) {
+                    try {
+                        sb.append(key).append("=").append(URLEncoder.encode(URLDecoder.decode(st, UTF_8.name()), UTF_8.name())).append("&");
+                    } catch (UnsupportedEncodingException e) {
+                        log.warn("getMapArrToStringError", e);
+                        sb.append(key).append("=").append(st).append("&");
+                    }
+                }
+            }
+        }
+        //去除最后的'&'符号
+        if(sb.toString().endsWith("&")){
+            sb.deleteCharAt(sb.length() - 1);
+        }
+        return sb.toString();
+    }
    
 	public static void downloadFile(HttpServletResponse response, Resource resource) {
 		if (resource != null) {
 			try(InputStream is = resource.getInputStream();OutputStream os = response.getOutputStream()
 				;BufferedInputStream bis = new BufferedInputStream(is)) {
-				response.reset();
-				response.setContentType("*");
-				response.setHeader("Access-Control-Allow-Origin", "*");
-
+				//response.reset();
+				//response.setContentType("*");
+				//response.setHeader("Access-Control-Allow-Origin", "*");
 				int len;
 				byte[] buff = new byte[1024];
 				while ((len = bis.read(buff)) != -1) {
