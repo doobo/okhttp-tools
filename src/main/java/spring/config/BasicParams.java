@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * com常用参数
- * @author qpc
  */
 @Configuration
 @ConfigurationProperties(prefix = "vip.ipav")

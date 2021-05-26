@@ -1,10 +1,7 @@
 package spring.config;
 
-
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StreamUtils;
-import org.springframework.web.util.HtmlUtils;
-
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -22,8 +19,6 @@ import java.util.Objects;
  * 1.预防xss攻击
  * 2.拓展requestbody无限获取(HttpServletRequestWrapper只能获取一次)
  * </p>
- *
- * @author Caratacus
  */
 public class RequestWrapper extends HttpServletRequestWrapper {
 
@@ -38,7 +33,7 @@ public class RequestWrapper extends HttpServletRequestWrapper {
 		try {
 			body = StreamUtils.copyToByteArray(request.getInputStream());
 		} catch (IOException e) {
-			new RuntimeException("Error: Get RequestBody byte[] fail," + e);
+			throw new RuntimeException(e);
 		}
 		this.body = body;
 	}
@@ -69,7 +64,6 @@ public class RequestWrapper extends HttpServletRequestWrapper {
 
 			/**
 			 * 监听方法
-			 * @param readListener
 			 */
 			@Override
 			@SuppressWarnings("EmptyMethod")
@@ -136,12 +130,10 @@ public class RequestWrapper extends HttpServletRequestWrapper {
 
 	/**
 	 * 使用spring HtmlUtils 转义html标签达到预防xss攻击效果
-	 *
-	 * @param str
-	 * @see HtmlUtils#htmlEscape
 	 */
 	protected String htmlEscape(String str) {
-		return HtmlUtils.htmlEscape(str);
+		//return HtmlUtils.htmlEscape(str);
+		return str;
 	}
 
 }

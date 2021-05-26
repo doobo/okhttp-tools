@@ -26,7 +26,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  */
 public class RestTemplateUtil {
 
-    private static Logger log = LoggerFactory.getLogger(RestTemplateUtil.class);
+    private static final Logger log = LoggerFactory.getLogger(RestTemplateUtil.class);
 
     private static final class SignRestTemplate{
 		static final RestTemplate INSTANCE = HttpUtils.createRestTemplate();
@@ -56,7 +56,6 @@ public class RestTemplateUtil {
 
     /**
      * 获取request里面的头部信息
-     * @param request
      */
     private static HttpHeaders getAuthorization(HttpServletRequest request) {
         HttpHeaders requestHeaders = new HttpHeaders();
@@ -73,9 +72,6 @@ public class RestTemplateUtil {
 
     /**
      * url里面不带参数
-     * @param url
-     * @param request
-     * @param responseType
      */
     public static <T> T getExchange(String url, HttpServletRequest request, ParameterizedTypeReference<T> responseType) {
         return RestTemplateUtil.getInstance().exchange(param(request, url)
@@ -85,10 +81,6 @@ public class RestTemplateUtil {
 
     /**
      * url里面有参数
-     * @param url
-     * @param request
-     * @param responseType
-     * @param uriVariables
      */
     public static <T> T getExchange(String url, HttpServletRequest request, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
         return RestTemplateUtil.getInstance().exchange(param(request, url)
@@ -98,12 +90,6 @@ public class RestTemplateUtil {
 
     /**
      * 自定义头部信息
-     * @param url
-     * @param request
-     * @param headers
-     * @param cls
-     * @param uriVariables
-     * @param <T>
      */
     public static <T> ResponseEntity<T> getExchange(String url, HttpServletRequest request, HttpHeaders headers, Class<T> cls, Object... uriVariables) {
         return RestTemplateUtil.getInstance().exchange(paramGet(request, url), HttpMethod.GET
@@ -112,9 +98,6 @@ public class RestTemplateUtil {
 
     /**
      * 原生http请求
-     * @param url
-     * @param responseType
-     * @param uriVariables
      */
     public static <T> T getExchange(String url, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
         return RestTemplateUtil.getInstance().exchange(url
@@ -124,11 +107,6 @@ public class RestTemplateUtil {
     
     /**
      * 自定义头部信息
-     * @param url
-     * @param headers
-     * @param cls
-     * @param uriVariables
-     * @param <T>
      */
     public static <T> ResponseEntity<T> getExchange(String url, HttpHeaders headers, Class<T> cls, Object... uriVariables) {
         return RestTemplateUtil.getInstance().exchange(url, HttpMethod.GET
@@ -137,10 +115,6 @@ public class RestTemplateUtil {
 
     /**
      * url里面不带参数
-     * @param url
-     * @param request
-     * @param data
-     * @param responseType
      */
     public static <T> T postExchange(String url, HttpServletRequest request, Object data, ParameterizedTypeReference<T> responseType) {
         return RestTemplateUtil.getInstance().exchange(param(request, url)
@@ -150,9 +124,6 @@ public class RestTemplateUtil {
 
     /**
      * url里面不带参数
-     * @param url
-     * @param request
-     * @param responseType
      */
     public static <T> T postExchange(String url, HttpServletRequest request, ParameterizedTypeReference<T> responseType) {
         return RestTemplateUtil.getInstance().exchange(param(request, url)
@@ -162,10 +133,6 @@ public class RestTemplateUtil {
 
     /**
      * url里面有参数
-     * @param url
-     * @param request
-     * @param responseType
-     * @param uriVariables
      */
     public static <T> T postExchange(String url, HttpServletRequest request, Object data, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
         return RestTemplateUtil.getInstance().exchange(param(request, url)
@@ -175,10 +142,6 @@ public class RestTemplateUtil {
 
     /**
      * 原生http请求
-     * @param url
-     * @param data
-     * @param responseType
-     * @param uriVariables
      */
     public static <T> T postExchange(String url, String data, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
         return RestTemplateUtil.getInstance().exchange(url
@@ -188,10 +151,6 @@ public class RestTemplateUtil {
 
     /**
      * url里面不带参数
-     * @param url
-     * @param request
-     * @param data
-     * @param responseType
      */
     public static <T> T putExchange(String url, HttpServletRequest request, Object data, ParameterizedTypeReference<T> responseType) {
         return RestTemplateUtil.getInstance().exchange(param(request, url)
@@ -201,10 +160,6 @@ public class RestTemplateUtil {
 
     /**
      * url里面有参数
-     * @param url
-     * @param request
-     * @param responseType
-     * @param uriVariables
      */
     public static <T> T putExchange(String url, HttpServletRequest request, Object data, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
         return RestTemplateUtil.getInstance().exchange(param(request, url)
@@ -214,10 +169,6 @@ public class RestTemplateUtil {
 
     /**
      * 原生http请求
-     * @param url
-     * @param data
-     * @param responseType
-     * @param uriVariables
      */
     public static <T> T putExchange(String url, String data, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
         return RestTemplateUtil.getInstance().exchange(url
@@ -227,11 +178,6 @@ public class RestTemplateUtil {
 
     /**
      * url里面不带参数
-     * @param url
-     * @param request
-     * @param data
-     * @param responseType
-     * @return
      */
     public static <T> T delExchange(String url, HttpServletRequest request, Object data, ParameterizedTypeReference<T> responseType) {
         return RestTemplateUtil.getInstance().exchange(param(request, url)
@@ -241,10 +187,6 @@ public class RestTemplateUtil {
 
     /**
      * url里面有参数
-     * @param url
-     * @param request
-     * @param responseType
-     * @param uriVariables
      */
     public static <T> T delExchange(String url, HttpServletRequest request, Object data, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
         return RestTemplateUtil.getInstance().exchange(param(request, url)
@@ -254,10 +196,6 @@ public class RestTemplateUtil {
 
     /**
      * 原生http请求
-     * @param url
-     * @param data
-     * @param responseType
-     * @param uriVariables
      */
     public static <T> T delExchange(String url, String data, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
         return RestTemplateUtil.getInstance().exchange(url
@@ -267,10 +205,6 @@ public class RestTemplateUtil {
 
     /**
      * 原生http请求
-     * @param url
-     * @param data
-     * @param responseType
-     * @param uriVariables
      */
     public static <T> T headExchange(String url, String data, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
         return RestTemplateUtil.getInstance().exchange(url
@@ -280,10 +214,6 @@ public class RestTemplateUtil {
 
     /**
      * 原生http请求
-     * @param url
-     * @param data
-     * @param responseType
-     * @param uriVariables
      */
     public static <T> T traceExchange(String url, String data, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
         return RestTemplateUtil.getInstance().exchange(url
@@ -293,10 +223,6 @@ public class RestTemplateUtil {
 
     /**
      * 原生http请求
-     * @param url
-     * @param data
-     * @param responseType
-     * @param uriVariables
      */
     public static <T> T patchExchange(String url, String data, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
         return RestTemplateUtil.getInstance().exchange(url
@@ -306,10 +232,6 @@ public class RestTemplateUtil {
 
     /**
      * 原生http请求
-     * @param url
-     * @param data
-     * @param responseType
-     * @param uriVariables
      */
     public static <T> T optionsExchange(String url, String data, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
         return RestTemplateUtil.getInstance().exchange(url
@@ -369,8 +291,6 @@ public class RestTemplateUtil {
 
     /**
      * 组装文件里面自带的file属性
-     * @param headers
-     * @param map
      */
     public static HttpHeaders covertFileHeaders(HttpHeaders headers, MultiValueMap<String, Object> map, HttpServletRequest request){
         headers = headers == null?new HttpHeaders():headers;
@@ -389,8 +309,6 @@ public class RestTemplateUtil {
 
     /**
      * 创建目录
-     * @param tempPath
-     * @throws IOException
      */
     private static String createDir(String tempPath) throws IOException {
         File file = new File(tempPath);
@@ -402,7 +320,6 @@ public class RestTemplateUtil {
 
     /**
      * 删除临时文件
-     * @param tempList
      */
     private static void deleteLocalTempFiles(List<String> tempList) {
         if (!CollectionUtils.isEmpty(tempList)) {
@@ -420,8 +337,6 @@ public class RestTemplateUtil {
 
     /**
      * 组装Get里面的参数
-     * @param request
-     * @param url
      */
     private static String paramGet(HttpServletRequest request, String url) {
         if(url == null || url.isEmpty()){
@@ -443,16 +358,15 @@ public class RestTemplateUtil {
         String[] strings = str.split("&");
         MultiValueMap<String,String> map = new LinkedMultiValueMap<String, String>();
         //循环加入map
-        for (int i = 0 ; i < strings.length ; i++){
-            String[] strArray = strings[i].split("=");
-            map.add(strArray[0] , strArray[1]);
+        for (String string : strings) {
+            String[] strArray = string.split("=");
+            map.add(strArray[0], strArray[1]);
         }
         return map;
     }
 
     /**
      * 获取查询字符串
-     * @param str
      */
     public static String getQueryString(String str) {
         if ( str == null ||  str.isEmpty()){
@@ -465,7 +379,6 @@ public class RestTemplateUtil {
 
     /**
      * 组装Get参数
-     * @param map
      */
     public static String multiValueMapToUrl(MultiValueMap<String, String> map) {
         if(map == null || map.isEmpty()){
@@ -484,7 +397,6 @@ public class RestTemplateUtil {
 
     /**
      * 字段排序,并编码拼接字符串
-     * @param map
      */
     public static String getMapArrToString(Map<String, String[]> map) {
         if(map == null || map.isEmpty()){
