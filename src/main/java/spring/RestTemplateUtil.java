@@ -9,6 +9,7 @@ import org.springframework.http.*;
 import org.springframework.util.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+import spring.config.RestTemplateCreateUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,12 +29,8 @@ public class RestTemplateUtil {
 
     private static final Logger log = LoggerFactory.getLogger(RestTemplateUtil.class);
 
-    private static final class SignRestTemplate{
-		static final RestTemplate INSTANCE = HttpUtils.createRestTemplate();
-    }
-
     public static RestTemplate getInstance() {
-		return SignRestTemplate.INSTANCE;
+		return RestTemplateCreateUtils.getAbstractHttpService().createRestTemplate();
     }
 
     public static HttpEntity<Object> paramBody(HttpServletRequest request) {
@@ -42,7 +39,7 @@ public class RestTemplateUtil {
             return new HttpEntity<>(body, getAuthorization(request));
         } catch (Exception e) {
             log.warn("RestTemplateUtilError", e);
-            return new HttpEntity<>(null, getAuthorization(request));
+            return new HttpEntity<>( getAuthorization(request));
         }
     }
 
@@ -59,6 +56,9 @@ public class RestTemplateUtil {
      */
     private static HttpHeaders getAuthorization(HttpServletRequest request) {
         HttpHeaders requestHeaders = new HttpHeaders();
+        if(request == null){
+            return requestHeaders;
+        }
         Enumeration<String> em = request.getHeaderNames();
         if(em != null){
             String name;
@@ -82,35 +82,35 @@ public class RestTemplateUtil {
     /**
      * url里面有参数
      */
-    public static <T> T getExchange(String url, HttpServletRequest request, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
+    public static <T> T getExchange(String url, HttpServletRequest request, Class<T> responseType, Object ...uriVariables) {
         return RestTemplateUtil.getInstance().exchange(param(request, url)
-                , HttpMethod.GET, new HttpEntity<>(null, getAuthorization(request))
+                , HttpMethod.GET, new HttpEntity<>(getAuthorization(request))
                 , responseType, uriVariables).getBody();
     }
 
     /**
      * 自定义头部信息
      */
-    public static <T> ResponseEntity<T> getExchange(String url, HttpServletRequest request, HttpHeaders headers, Class<T> cls, Object... uriVariables) {
+    public static <T> ResponseEntity<T> getExchange(String url, HttpServletRequest request, Class<T> cls, HttpHeaders headers, Object... uriVariables) {
         return RestTemplateUtil.getInstance().exchange(paramGet(request, url), HttpMethod.GET
-                , new HttpEntity<>(null, headers), cls, uriVariables);
+                , new HttpEntity<>( headers), cls, uriVariables);
     }
 
     /**
      * 原生http请求
      */
-    public static <T> T getExchange(String url, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
+    public static <T> T get(String url, ParameterizedTypeReference<T> responseType, HttpHeaders headers, Object ...uriVariables) {
         return RestTemplateUtil.getInstance().exchange(url
-                , HttpMethod.GET, new HttpEntity<>(null)
+                , HttpMethod.GET, new HttpEntity<>(headers)
                 , responseType, uriVariables).getBody();
     }
     
     /**
      * 自定义头部信息
      */
-    public static <T> ResponseEntity<T> getExchange(String url, HttpHeaders headers, Class<T> cls, Object... uriVariables) {
+    public static <T> ResponseEntity<T> getByClass(String url, Class<T> cls, HttpHeaders headers, Object... uriVariables) {
         return RestTemplateUtil.getInstance().exchange(url, HttpMethod.GET
-                , new HttpEntity<>(null, headers), cls, uriVariables);
+                , new HttpEntity<>( headers), cls, uriVariables);
     }
 
     /**
@@ -123,18 +123,9 @@ public class RestTemplateUtil {
     }
 
     /**
-     * url里面不带参数
-     */
-    public static <T> T postExchange(String url, HttpServletRequest request, ParameterizedTypeReference<T> responseType) {
-        return RestTemplateUtil.getInstance().exchange(param(request, url)
-                , HttpMethod.POST, paramBody(request)
-                , responseType).getBody();
-    }
-
-    /**
      * url里面有参数
      */
-    public static <T> T postExchange(String url, HttpServletRequest request, Object data, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
+    public static <T> T postByParams(String url, HttpServletRequest request, Object data, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
         return RestTemplateUtil.getInstance().exchange(param(request, url)
                 , HttpMethod.POST, paramBody(request, data)
                 , responseType, uriVariables).getBody();
@@ -143,10 +134,19 @@ public class RestTemplateUtil {
     /**
      * 原生http请求
      */
-    public static <T> T postExchange(String url, String data, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
+    public static <T> T post(String url, String data, ParameterizedTypeReference<T> responseType, HttpHeaders headers, Object ...uriVariables) {
         return RestTemplateUtil.getInstance().exchange(url
-                , HttpMethod.GET, new HttpEntity<>(data)
+                , HttpMethod.POST, new HttpEntity<>(data, headers)
                 , responseType, uriVariables).getBody();
+    }
+
+    /**
+     * 原生http请求
+     */
+    public static <T> ResponseEntity<T> postByClass(String url, String data, Class<T> cls, HttpHeaders headers, Object ...uriVariables) {
+        return RestTemplateUtil.getInstance().exchange(url
+                , HttpMethod.POST, new HttpEntity<>(data, headers)
+                , cls, uriVariables);
     }
 
     /**
@@ -161,7 +161,7 @@ public class RestTemplateUtil {
     /**
      * url里面有参数
      */
-    public static <T> T putExchange(String url, HttpServletRequest request, Object data, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
+    public static <T> T putByParams(String url, HttpServletRequest request, Object data, Class<T> responseType, Object ...uriVariables) {
         return RestTemplateUtil.getInstance().exchange(param(request, url)
                 , HttpMethod.PUT, paramBody(request, data)
                 , responseType, uriVariables).getBody();
@@ -170,10 +170,19 @@ public class RestTemplateUtil {
     /**
      * 原生http请求
      */
-    public static <T> T putExchange(String url, String data, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
+    public static <T> T put(String url, String data, ParameterizedTypeReference<T> responseType, HttpHeaders headers, Object ...uriVariables) {
         return RestTemplateUtil.getInstance().exchange(url
-                , HttpMethod.PUT, new HttpEntity<>(data)
+                , HttpMethod.PUT, new HttpEntity<>(data, headers)
                 , responseType, uriVariables).getBody();
+    }
+
+    /**
+     * 原生http请求
+     */
+    public static <T> ResponseEntity<T> putByClass(String url, String data, Class<T> responseType, HttpHeaders headers, Object ...uriVariables) {
+        return RestTemplateUtil.getInstance().exchange(url
+                , HttpMethod.PUT, new HttpEntity<>(data, headers)
+                , responseType, uriVariables);
     }
 
     /**
@@ -197,48 +206,96 @@ public class RestTemplateUtil {
     /**
      * 原生http请求
      */
-    public static <T> T delExchange(String url, String data, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
+    public static <T> T del(String url, String data, ParameterizedTypeReference<T> responseType, HttpHeaders headers, Object ...uriVariables) {
         return RestTemplateUtil.getInstance().exchange(url
-                , HttpMethod.DELETE, new HttpEntity<>(data)
+                , HttpMethod.DELETE, new HttpEntity<>(data, headers)
                 , responseType, uriVariables).getBody();
     }
 
     /**
      * 原生http请求
      */
-    public static <T> T headExchange(String url, String data, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
+    public static <T> ResponseEntity<T> delByClass(String url, String data, Class<T> responseType, HttpHeaders headers, Object ...uriVariables) {
         return RestTemplateUtil.getInstance().exchange(url
-                , HttpMethod.HEAD, new HttpEntity<>(data)
+                , HttpMethod.DELETE, new HttpEntity<>(data, headers)
+                , responseType, uriVariables);
+    }
+
+    /**
+     * 原生http请求
+     */
+    public static <T> T head(String url, String data, ParameterizedTypeReference<T> responseType, HttpHeaders headers, Object ...uriVariables) {
+        return RestTemplateUtil.getInstance().exchange(url
+                , HttpMethod.HEAD, new HttpEntity<>(data, headers)
                 , responseType, uriVariables).getBody();
     }
 
     /**
      * 原生http请求
      */
-    public static <T> T traceExchange(String url, String data, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
+    public static <T> ResponseEntity<T> headByClass(String url, String data, Class<T> responseType, HttpHeaders headers, Object ...uriVariables) {
         return RestTemplateUtil.getInstance().exchange(url
-                , HttpMethod.TRACE, new HttpEntity<>(data)
+                , HttpMethod.HEAD, new HttpEntity<>(data, headers)
+                , responseType, uriVariables);
+    }
+
+    /**
+     * 原生http请求
+     */
+    public static <T> T trace(String url, String data, ParameterizedTypeReference<T> responseType, HttpHeaders headers, Object ...uriVariables) {
+        return RestTemplateUtil.getInstance().exchange(url
+                , HttpMethod.TRACE, new HttpEntity<>(data, headers)
                 , responseType, uriVariables).getBody();
     }
 
     /**
      * 原生http请求
      */
-    public static <T> T patchExchange(String url, String data, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
+    public static <T> ResponseEntity<T> traceByClass(String url, String data, Class<T> responseType, HttpHeaders headers, Object ...uriVariables) {
         return RestTemplateUtil.getInstance().exchange(url
-                , HttpMethod.PATCH, new HttpEntity<>(data)
+                , HttpMethod.TRACE, new HttpEntity<>(data, headers)
+                , responseType, uriVariables);
+    }
+
+    /**
+     * 原生http请求
+     */
+    public static <T> T patch(String url, String data, ParameterizedTypeReference<T> responseType, HttpHeaders headers, Object ...uriVariables) {
+        return RestTemplateUtil.getInstance().exchange(url
+                , HttpMethod.PATCH, new HttpEntity<>(data, headers)
                 , responseType, uriVariables).getBody();
     }
 
     /**
      * 原生http请求
      */
-    public static <T> T optionsExchange(String url, String data, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
+    public static <T> ResponseEntity<T> patchByClass(String url, String data, Class<T> responseType, HttpHeaders headers, Object ...uriVariables) {
         return RestTemplateUtil.getInstance().exchange(url
-                , HttpMethod.OPTIONS, new HttpEntity<>(data)
+                , HttpMethod.PATCH, new HttpEntity<>(data, headers)
+                , responseType, uriVariables);
+    }
+
+    /**
+     * 原生http请求
+     */
+    public static <T> T options(String url, String data, ParameterizedTypeReference<T> responseType, HttpHeaders headers, Object ...uriVariables) {
+        return RestTemplateUtil.getInstance().exchange(url
+                , HttpMethod.OPTIONS, new HttpEntity<>(data, headers)
                 , responseType, uriVariables).getBody();
     }
 
+    /**
+     * 原生http请求
+     */
+    public static <T> ResponseEntity<T> optionsByClass(String url, Class<T> responseType, HttpHeaders headers, Object ...uriVariables) {
+        return RestTemplateUtil.getInstance().exchange(url
+                , HttpMethod.OPTIONS, new HttpEntity<>(headers)
+                , responseType, uriVariables);
+    }
+
+    /**
+     * 文件上传转发
+     */
     public static <T> T postMultipartFile(String url, HttpServletRequest request ,Map<String, Object> body, ParameterizedTypeReference<T> reference, Object... uriVariables) {
         HttpHeaders headers = getAuthorization(request);
         headers.remove("Content-Type");
@@ -433,7 +490,10 @@ public class RestTemplateUtil {
         }
         return sb.toString();
     }
-   
+
+    /**
+     * 获取文件后转发给前端
+     */
 	public static void downloadFile(HttpServletResponse response, Resource resource) {
 		if (resource != null) {
 			try(InputStream is = resource.getInputStream();OutputStream os = response.getOutputStream()

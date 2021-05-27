@@ -2,15 +2,15 @@
 
 [![License](https://img.shields.io/badge/license-Apache%202-green.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 
-> 对Okhttp3进行二次封装,对外提供了POST请求、GET请求、PATCH请求、PUT请求、DELETE请求、上传文件、下载文件、取消请求、Ws/Wss请求、Raw/Json/Gson返回、后台下载管理等功能.
+> 对Okhttp3和RestTemplate进行简单封装,对外提供了POST请求、GET请求、PATCH请求、PUT请求、DELETE请求、上传文件、下载文件、取消请求、Ws/Wss请求、Raw/Json/Gson返回、后台下载管理等功能.
 * 如果异步使用相关JSON解析器，请主动添加该包，默认不会添加，以免引起不必要的引入,去掉对中文header内容的判断，可以在header里面添加中文值
-
+* 添加对springboot的restTemplate支持,可自定义restTemplate,调用简单
 ## 如何添加
 ```
  <dependency>
    <groupId>com.github.doobo</groupId>
    <artifactId>okhttp-tools</artifactId>
-   <version>1.1</version>
+   <version>1.2</version>
  </dependency>
  
   <!--添加网络日志拦截,如不需要,不必添加该包-->
@@ -21,35 +21,49 @@
   </dependency>
 ```
 
-## 1 总体简介
+### 在springboot项目里面额外引用
+```xml
+<dependency>
+    <groupId>org.apache.httpcomponents</groupId>
+    <artifactId>httpclient</artifactId>
+    <version>4.5.6</version>
+</dependency>
+```
 
-### 1.1 调用方式
+## RestTemplate使用
+```
+@Test
+public void testGet(){
+    int a = 1;
+    ResponseEntity<String> byClass = RestTemplateUtil.getByClass("https://baidu.com?a={a}", String.class, null, a);
+    System.out.println(byClass.getBody());
+}
 
-整个调用采用链式调用的方式. 方便以后扩展.
+@Test
+public void testPost(){
+    ResponseEntity<String> byClass = RestTemplateUtil.postByClass("https://baidu.com", null, String.class, null);
+    System.out.println(byClass.getBody());
+}
 
-### 1.2 请求类型
+@Test
+public void testPut(){
+    ResponseEntity<String> byClass = RestTemplateUtil.optionsByClass("https://baidu.com", String.class, null);
+    System.out.println(byClass.getBody());
+}
+```
 
-现在有Get, Post, Patch, Put, Delete, Upload, Download, Ws/Wss这些请求方式
+### 自定义RestTemplate
+继承AbstractHttpService,覆写createRestTemplate方法，返回RestTemplate即可
 
-### 1.3 添加参数方式
-
-添加参数可以使用addParam一个个添加, 也可以使用params一次性添加
-
-### 1.4 添加Header方式
-
-添加参数可以使用addHeader一个个添加, 也可以使用headers一次性添加
-
-### 1.5 回调格式
-
+### 回调格式
 现在回调格式有以下几种:
-
 1. Raw原生数据 RawResponseHandler
 2. Json JsonResponseHandler
 3. Gson GsonResponseHandler
 4. 下载 DownloadResponseHandler
 5. 长连接 WsResponseHandler
 
-## 2 调用示例
+## OkHttp调用示例
 ```code
    //GET请求
     @Test
@@ -280,15 +294,6 @@
 
 ## 添加springboot的restTemplate模板支持,GET/POST/PUT/DELETE/HEAD/TRACE/PATCH/OPTIONS
 
-### 在springboot项目里面额外引用
-```xml
-<dependency>
-    <groupId>org.apache.httpcomponents</groupId>
-    <artifactId>httpclient</artifactId>
-    <version>4.5.6</version>
-</dependency>
-```
-
 ### restTemplate使用实例
 ```
     //直接使用
@@ -410,12 +415,12 @@
 
 ## 参考文献
 对于Okhttp3的封装参考了:
-1. [https://github.com/hongyangAndroid/okhttputils](https://github.com/hongyangAndroid/okhttputils)
-1. [https://github.com/jeasonlzy/okhttp-OkGo](https://github.com/jeasonlzy/okhttp-OkGo)
-1. [https://github.com/ZhaoKaiQiang/OkHttpPlus](https://github.com/ZhaoKaiQiang/OkHttpPlus)
+* [https://github.com/hongyangAndroid/okhttputils](https://github.com/hongyangAndroid/okhttputils)
+* [https://github.com/jeasonlzy/okhttp-OkGo](https://github.com/jeasonlzy/okhttp-OkGo)
+* [https://github.com/ZhaoKaiQiang/OkHttpPlus](https://github.com/ZhaoKaiQiang/OkHttpPlus)
 
 cookie本地持久化使用了PersistentCookieJar：
-1. [https://github.com/franmontiel/PersistentCookieJar](https://github.com/franmontiel/PersistentCookieJar)
+* [https://github.com/franmontiel/PersistentCookieJar](https://github.com/franmontiel/PersistentCookieJar)
 
 License
 -------
