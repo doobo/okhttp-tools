@@ -7,7 +7,7 @@
     <packaging>jar</packaging>
     <version>1.2-SNAPSHOT</version>
 
-    <name>OkHttpTools</name>
+    <name>okhttp-tools</name>
     <description>OKHttp3的简单封装，链式调用</description>
     <url>https://github.com/doobo/OkHttpTools</url>
 

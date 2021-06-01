@@ -31,7 +31,12 @@
 ```
 
 ## RestTemplate使用
-```
+```code
+@RequestMapping("")
+public ResponseEntity<String> proxyHttp(String url){
+    return RestTemplateUtil.getByClass(url, String.class, null);
+}
+
 @Test
 public void testGet(){
     int a = 1;
@@ -152,7 +157,6 @@ public void testPut(){
         CountDownLatch countDownLatch = new CountDownLatch(1);
         String wsUrl = "ws://5fu8.com/chatroomServer/1021";
 
-
         WsBuilder builder = OkHttpClientTools.getInstance().ws()
                 .url(wsUrl)
                 .build();
@@ -238,30 +242,6 @@ public void testPut(){
         System.out.println(str);
     }
 
-    /**
-     * 请求日志跟踪
-     *
-     * @throws IOException
-     */
-    @Test
-    public void logTest() throws IOException {
-        //创建日志拦截器
-        HttpLoggingInterceptor logging = new HttpLoggingInterceptor(new HttpLogger());
-        //设置日志级别，共包含四个级别：NONE、BASIC、HEADERS、BODY
-        logging.setLevel(HttpLoggingInterceptor.Level.HEADERS);
-        OkHttpClient client = new OkHttpClient.Builder()
-                .addInterceptor(logging)
-                .build();
-
-        String str = new OkHttpClientTools(client)
-                .get()
-                .url("https://5fu8.com/short_url/shorten.json")
-                .addParam("source", "3271760578")
-                .addParam("url_long", "http://www.5fu8.com/note/249723561")
-                .execute().body().string();
-        System.out.println(str);
-    }
-    
     //获取请求的CODE
     @Test
     public void testAutoLogin() throws IOException {
@@ -296,24 +276,7 @@ public void testPut(){
 
 ### restTemplate使用实例
 ```
-    //直接使用
-    @Test
-    public void testGet(){
-        String str = RestTemplateUtil.getExchange("https://hao.360.cn/?src={}&ls={}"
-        , new ParameterizedTypeReference<String>(){}, "lm", "n2a27c3f091");
-        System.out.println(str);
-    }
-    
-    //配合spring做代理转发,如果想自动带参数过去,需要配置扫描路径：@ComponentScan("spring.config")
-    @ApiOperation(value = "办件作废申请")
-    @PostMapping("/Affairs/ApplyDiscardAffairsInfo")
-    @HasPermission(value = {PermissionType.NORMAL_ROLE, PermissionType.ADMIN_ROLE})
-    public ResultTemplate<List<Boolean>> applyDiscardAffairsInfoPost(HttpServletRequest request,
-        @RequestBody DiscardServiceModel body) {
-        return RestTemplateUtil.postExchange(host + request.getRequestURI(), request
-                ,new ParameterizedTypeReference<ResultTemplate<List<Boolean>>>() {});
-    }
-    
+
     //文件下载
     @ApiOperation(value = "Pdf打印")
     @ApiImplicitParams({
