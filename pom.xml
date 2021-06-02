@@ -9,7 +9,7 @@
 
     <name>okhttp-tools</name>
     <description>OKHttp3的简单封装，链式调用</description>
-    <url>https://github.com/doobo/OkHttpTools</url>
+    <url>https://github.com/doobo/okhttp-tools</url>
 
     <licenses>
         <license>
@@ -21,9 +21,9 @@
 
     <scm>
         <tag>v1.2</tag>
-        <url>scm:https://github.com/doobo/OkHttpTools</url>
-        <connection>scm:git:git@github.com:doobo/OkHttpTools.git</connection>
-        <developerConnection>scm:git:git@github.com:doobo/OkHttpTools.git</developerConnection>
+        <url>scm:https://github.com/doobo/okhttp-tools</url>
+        <connection>scm:git:git@github.com:doobo/okhttp-tools.git</connection>
+        <developerConnection>scm:git:git@github.com:doobo/okhttp-tools.git</developerConnection>
     </scm>
 
     <developers>
