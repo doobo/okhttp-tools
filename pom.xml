@@ -36,7 +36,7 @@
     
     <properties>
         <okhttp.version>3.14.9</okhttp.version>
-        <spring.boot.version>2.2.6.RELEASE</spring.boot.version>
+        <spring.boot.version>2.5.12</spring.boot.version>
         <apache.http.version>4.5.13</apache.http.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
