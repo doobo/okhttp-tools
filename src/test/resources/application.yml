@@ -1,0 +1,8 @@
+okhttp:
+  tools:
+    startConfig: true
+    maxIdleConnections: 50
+    keepAliveDuration: 300
+    connectTimeout: 20
+    readTimeout: 30
+    writeTimeout: 20

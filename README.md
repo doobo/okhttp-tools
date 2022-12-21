@@ -2,39 +2,40 @@
 
 [![License](https://img.shields.io/badge/license-Apache%202-green.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 
-> 对Okhttp3和RestTemplate进行简单封装,对外提供了POST请求、GET请求、PATCH请求、PUT请求、DELETE请求、上传文件、下载文件、取消请求、Ws/Wss请求、Raw/Json/Gson返回、后台下载管理等功能.
-* 如果异步使用相关JSON解析器，请主动添加该包，默认不会添加，以免引起不必要的引入,去掉对中文header内容的判断，可以在header里面添加中文值
-* 添加对springboot的restTemplate支持,可自定义restTemplate,调用简单
+> 对Okhttp3和RestTemplate进行简单封装,对外提供了POST、GET、PATCH、PUT、DELETE、上传文件、下载文件、取消请求、Ws/Wss请求.
+* 如果异步使用相关JSON解析器，请主动添加该包，默认不会添加，以免引起不必要的引
+* 添加对spring的restTemplate支持,可自定义相关参数，参考文件:okhttp-tools-default.yml,对restTemplate的关系映射使用的是fastjson
 ## 如何添加
 ```
  <dependency>
    <groupId>com.github.doobo</groupId>
    <artifactId>okhttp-tools</artifactId>
-   <version>1.2</version>
+   <version>1.3</version>
  </dependency>
- 
-  <!--添加网络日志拦截,如不需要,不必添加该包-->
-  <dependency>
-     <groupId>com.squareup.okhttp3</groupId>
-     <artifactId>logging-interceptor</artifactId>
-     <version>3.14.9</version>
-  </dependency>
 ```
 
-### 在springboot项目里面额外引用
-```xml
-<dependency>
-    <groupId>org.apache.httpcomponents</groupId>
-    <artifactId>httpclient</artifactId>
-    <version>4.5.6</version>
-</dependency>
+### 在spring项目中使用
+```yml
+okhttp:
+  tools:
+    startConfig: true
+    maxIdleConnections: 30
+    keepAliveDuration: 300
+    connectTimeout: 10
+    readTimeout: 20
+    writeTimeout: 10
 ```
 
 ## RestTemplate使用
 ```code
-@RequestMapping("")
-public ResponseEntity<String> proxyHttp(String url){
-    return RestTemplateUtil.getByClass(url, String.class, null);
+//代理URL资源文件
+@RestController
+public class IndexController {
+
+    @GetMapping
+    public ResponseEntity<byte[]> proxyHttp(String url){
+        return RestTemplateUtil.getByClass(url, byte[].class, null);
+    }
 }
 
 @Test
@@ -56,9 +57,6 @@ public void testPut(){
     System.out.println(byClass.getBody());
 }
 ```
-
-### 自定义RestTemplate
-继承AbstractHttpService,覆写createRestTemplate方法，返回RestTemplate即可
 
 ### 回调格式
 现在回调格式有以下几种:

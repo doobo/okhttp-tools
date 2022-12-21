@@ -1,12 +1,12 @@
-import org.junit.Test;
+import com.github.doobo.okhttp.util.RestTemplateUtil;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
-import spring.RestTemplateUtil;
 
 /**
  * spring的http工具测试
  */
 public class SpringTestTemplate {
-    
+
     @Test
     public void testGet(){
         int a = 1;

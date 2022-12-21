@@ -1,12 +1,15 @@
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.github.doobo.okhttp.response.DownloadResponseHandler;
+import com.github.doobo.okhttp.response.GsonResponseHandler;
+import com.github.doobo.okhttp.response.JsonResponseHandler;
+import com.github.doobo.okhttp.response.RawResponseHandler;
 import okhttp3.*;
 
 import okhttp3.logging.HttpLoggingInterceptor;
-import org.junit.Test;
-import vip.ipav.okhttp.OkHttpClientTools;
-import vip.ipav.okhttp.response.*;
-import vip.ipav.okhttp.util.RegularUtils;
+import com.github.doobo.okhttp.OkHttpClientTools;
+import com.github.doobo.okhttp.util.RegularUtils;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;

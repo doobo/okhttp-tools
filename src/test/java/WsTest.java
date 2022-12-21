@@ -1,9 +1,9 @@
 import okhttp3.*;
 import okio.ByteString;
-import org.junit.Test;
-import vip.ipav.okhttp.OkHttpClientTools;
-import vip.ipav.okhttp.builder.WsBuilder;
-import vip.ipav.okhttp.response.WsResponseHandler;
+import com.github.doobo.okhttp.OkHttpClientTools;
+import com.github.doobo.okhttp.builder.WsBuilder;
+import com.github.doobo.okhttp.response.WsResponseHandler;
+import org.junit.jupiter.api.Test;
 
 import java.util.Timer;
 import java.util.TimerTask;

@@ -1,7 +1,7 @@
 import okhttp3.OkHttpClient;
 import okhttp3.Response;
-import org.junit.Test;
-import vip.ipav.okhttp.OkHttpClientTools;
+import com.github.doobo.okhttp.OkHttpClientTools;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
@@ -70,7 +70,7 @@ public class HttpThread {
     public void testThreadLocal() throws InterruptedException {
         /*创建线程局部变量，使之线程安全*/
         ThreadLocal<String> myLocalString = new ThreadLocal<>();
-        myLocalString.set("www.ipav.vip");
+        myLocalString.set("www.5fu8.com");
         CountDownLatch countDownLatch = new CountDownLatch(1);
         new Thread(() -> {
             System.out.printf("%s\t%d\n",myLocalString.get(),0);
