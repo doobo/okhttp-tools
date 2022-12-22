@@ -73,19 +73,27 @@ String str = new OkHttpClientTools(client)
 System.out.println(str);
 
 //简单下载文件
-new OkHttpClientTools(client)
-    .upload()
-    .url("http://pic.sogou.com/pic/upload_pic.jsp")
-    .addParam("type","utf-8;text/json")
-    .addFile("files", new File("/Users/doobo/Downloads/bbc.png"))
-    .enqueue(new RawResponseHandler() {
+OkHttpClientTools.getInstance()
+    .download()
+    .url("http://p4.so.qhmsg.com/t01decceaa40a9f9a19.jpg")
+    .filePath("/Users/doobo/next.jpg")
+    .tag(this)
+    .enqueue(new DownloadResponseHandler() {
         @Override
-        public void onSuccess(int statusCode, String response) {
-            System.out.println(response);
+        public void onStart(long totalBytes) {
+            System.out.println("The File is Downing " + totalBytes);
         }
         @Override
-        public void onFailure(int statusCode, String error_msg) {
-            System.out.println(error_msg);
+        public void onFinish(File downloadFile) {
+            System.out.println("File was Down!");
+        }
+        @Override
+        public void onProgress(long currentBytes, long totalBytes) {
+            System.out.println("doDownload onProgress:" + currentBytes + "/" + totalBytes);
+        }
+        @Override
+        public void onFailure(String error_msg) {
+            countDownLatch.countDown();
         }
     });
 
@@ -126,119 +134,11 @@ WsResponseHandler wsResponseHandler = new WsResponseHandler() {
 };
 builder.enqueue(wsResponseHandler);
 ```
-
-## 添加springboot的restTemplate模板支持,GET/POST/PUT/DELETE/HEAD/TRACE/PATCH/OPTIONS
-
-### restTemplate使用实例
-```
-
-    //文件下载
-    @ApiOperation(value = "Pdf打印")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "affairInfoCode", dataType = "string", paramType = "query")
-    })
-    @PostMapping("/GetPdfFile")
-    public void getPdfFilePost(HttpServletRequest request, HttpServletResponse response) {
-        Resource resource = RestTemplateUtil.postExchange(PdfUrl.getPdfFilePost, request,ApiType.API_CENTRE, null
-                ,new ParameterizedTypeReference<Resource>() {});
-        RestTemplateUtil.downloadFile(response, resource);
-    }
-    
-    //如果想要自定义httpUtil的参数,如日志监控等,BasicParams继承它，并暴露给Bean容器
-    @Bean
-    public HttpUtils httpUtils(){
-        HttpUtils httpUtils = new HttpUtils();
-        HttpUtils.basicParams(basicParams);
-        return httpUtils;
-    }
-    
-    //链路追踪配置
-    /**
-     * 配置 span 收集器
-     * @return
-     */
-    @Bean
-    public SpanCollector spanCollector() {
-        Config config = Config.builder()
-                .connectTimeout(connecTimeout)
-                .compressionEnabled(compressionEnabled)
-                .flushInterval(flushInterval)
-                .readTimeout(readTimeout)
-                .build();
-
-        return HttpSpanCollector.create(url, config, new EmptySpanCollectorMetricsHandler());
-    }
-
-    /**
-     * 配置采集率
-     * @param spanCollector
-     * @return
-     */
-    @Bean
-    public Brave brave(SpanCollector spanCollector) {
-        Builder builder = new Builder(serviceName);
-        builder.spanCollector(spanCollector)
-                .traceSampler(Sampler.create(samplerRate))
-                .build();
-        return builder.build();
-    }
-    
-    @Bean
-    public CloseableHttpClient httpClient(Brave brave) {
-        CloseableHttpClient httpclient = HttpClients.custom()
-                .addInterceptorFirst(new BraveHttpRequestInterceptor(brave.clientRequestInterceptor(),
-                        new DefaultSpanNameProvider()))
-                .addInterceptorFirst(new BraveHttpResponseInterceptor(brave.clientResponseInterceptor()))
-                .setMaxConnTotal(ComProperties.getTotal()).setMaxConnPerRoute(ComProperties.getRoute())
-                .build();
-        return httpclient;
-    }
-
-    /**
-     * 配置zk拦截器
-     * @param httpClient
-     * @return
-     */
-    @Bean
-    public RestTemplateUtil restTemplateUtil(CloseableHttpClient httpClient){
-        RestTemplateUtil restTemplateUtil = new RestTemplateUtil();
-        restTemplateUtil.setHttpClient(httpClient);
-        return restTemplateUtil;
-    }
-    
-    /**
-     * 设置server的（服务端收到请求和服务端完成处理，并将结果发送给客户端）过滤器
-     * @Param:
-     * @return: 过滤器
-     * 不知道有用没,也许可以去掉
-     */
-    @Bean
-    public BraveServletFilter braveServletFilter(Brave brave) {
-        BraveServletFilter filter = new BraveServletFilter(brave.serverRequestInterceptor(),
-                brave.serverResponseInterceptor(), new DefaultSpanNameProvider());
-        return filter;
-    }
-    
-    //配置restTemplate
-    private static RestTemplate restTemplate() {
-        HttpComponentsClientHttpRequestFactory clientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
-        clientHttpRequestFactory.setConnectionRequestTimeout(ComProperties.getRequestTimeout());
-        clientHttpRequestFactory.setConnectTimeout(ComProperties.getConnectTimeout());
-        clientHttpRequestFactory.setReadTimeout(ComProperties.getReadTimeout());
-        RestTemplate restTemplate = new RestTemplate();
-        restTemplate.setRequestFactory(clientHttpRequestFactory);
-        return restTemplate;
-    }
-```
-
 ## 参考文献
 对于Okhttp3的封装参考了:
 * [https://github.com/hongyangAndroid/okhttputils](https://github.com/hongyangAndroid/okhttputils)
 * [https://github.com/jeasonlzy/okhttp-OkGo](https://github.com/jeasonlzy/okhttp-OkGo)
 * [https://github.com/ZhaoKaiQiang/OkHttpPlus](https://github.com/ZhaoKaiQiang/OkHttpPlus)
-
-cookie本地持久化使用了PersistentCookieJar：
-* [https://github.com/franmontiel/PersistentCookieJar](https://github.com/franmontiel/PersistentCookieJar)
 
 License
 -------
