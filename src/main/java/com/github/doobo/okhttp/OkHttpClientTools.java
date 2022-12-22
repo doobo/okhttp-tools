@@ -11,7 +11,7 @@ public class OkHttpClientTools {
         private static final OkHttpClientTools INSTANCE = new OkHttpClientTools();
     }
 
-    public static final OkHttpClientTools getInstance() {
+    public static OkHttpClientTools getInstance() {
         return LazyHolder.INSTANCE;
     }
 

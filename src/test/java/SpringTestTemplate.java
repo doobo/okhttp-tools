@@ -1,5 +1,6 @@
 import com.github.doobo.okhttp.util.RestTemplateUtil;
 import org.junit.jupiter.api.Test;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.ResponseEntity;
 
 /**
@@ -16,8 +17,9 @@ public class SpringTestTemplate {
 
     @Test
     public void testPost(){
-        ResponseEntity<String> byClass = RestTemplateUtil.postByClass("https://baidu.com", null, String.class, null);
-        System.out.println(byClass.getBody());
+        String byClass = RestTemplateUtil.post("https://baidu.com", "{}"
+                , new ParameterizedTypeReference<String>(){}, null);
+        System.out.println(byClass);
     }
 
     @Test
