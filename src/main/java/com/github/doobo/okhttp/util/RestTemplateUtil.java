@@ -53,15 +53,15 @@ public abstract class RestTemplateUtil {
     public static HttpEntity<Object> paramBody(HttpServletRequest request) {
         try {
 			byte[] body = StreamUtils.copyToByteArray(request.getInputStream());
-            return new HttpEntity<>(body, getAuthorization(request));
+            return new HttpEntity<>(body, getRequestHeader(request));
         } catch (Exception e) {
             log.error("RestTemplateUtilError", e);
-            return new HttpEntity<>(getAuthorization(request));
+            return new HttpEntity<>(getRequestHeader(request));
         }
     }
 
     public static HttpEntity<Object> paramBody(HttpServletRequest request, Object body) {
-        return new HttpEntity<>(body, getAuthorization(request));
+        return new HttpEntity<>(body, getRequestHeader(request));
     }
 
     private static String param(HttpServletRequest request, String url) {
@@ -71,7 +71,7 @@ public abstract class RestTemplateUtil {
     /**
      * 获取request里面的头部信息
      */
-    private static HttpHeaders getAuthorization(HttpServletRequest request) {
+    public static HttpHeaders getRequestHeader(HttpServletRequest request) {
         HttpHeaders requestHeaders = new HttpHeaders();
         if(request == null){
             return requestHeaders;
@@ -96,7 +96,7 @@ public abstract class RestTemplateUtil {
     public static <T> T getExchange(String url, HttpServletRequest request
             , ParameterizedTypeReference<T> responseType) {
         return RestTemplateUtil.getInstance().exchange(param(request, url)
-                , HttpMethod.GET, paramBody(null, getAuthorization(request))
+                , HttpMethod.GET, paramBody(null, getRequestHeader(request))
                 , responseType).getBody();
     }
 
@@ -106,7 +106,7 @@ public abstract class RestTemplateUtil {
     public static <T> T getByProxy(String url, HttpServletRequest request
             , Class<T> responseType, Object ...uriVariables) {
         return RestTemplateUtil.getInstance().exchange(param(request, url)
-                , HttpMethod.GET, new HttpEntity<>(getAuthorization(request))
+                , HttpMethod.GET, new HttpEntity<>(getRequestHeader(request))
                 , responseType, uriVariables).getBody();
     }
 
@@ -184,7 +184,7 @@ public abstract class RestTemplateUtil {
     public static <T> T putExchange(String url, HttpServletRequest request, Object data
             , ParameterizedTypeReference<T> responseType) {
         return RestTemplateUtil.getInstance().exchange(param(request, url)
-                , HttpMethod.PUT, new HttpEntity<>(data, getAuthorization(request))
+                , HttpMethod.PUT, new HttpEntity<>(data, getRequestHeader(request))
                 , responseType).getBody();
     }
 
@@ -343,7 +343,7 @@ public abstract class RestTemplateUtil {
      */
     public static <T> T postMultipartFile(String url, HttpServletRequest request ,Map<String, Object> body
             , ParameterizedTypeReference<T> reference, Object... uriVariables) {
-        HttpHeaders headers = getAuthorization(request);
+        HttpHeaders headers = getRequestHeader(request);
         headers.remove("Content-Type");
         headers.remove("ContentType");
         headers.setContentType(MediaType.parseMediaType("multipart/form-data;charset=UTF-8"));
@@ -559,4 +559,20 @@ public abstract class RestTemplateUtil {
 			}
 		}
 	}
+
+    /**
+     * 获取请求体
+     */
+    public static HttpEntity<Object> getHttpEntity(HttpServletRequest request, HttpHeaders headers, Object body) {
+        try {
+            if(Objects.nonNull(body)){
+                return new HttpEntity<>(body, headers);
+            }
+            byte[] bytes = StreamUtils.copyToByteArray(request.getInputStream());
+            return new HttpEntity<>(bytes, headers);
+        } catch (Exception e) {
+            log.error("getHttpEntityError:", e);
+            return new HttpEntity<>(headers);
+        }
+    }
 }
