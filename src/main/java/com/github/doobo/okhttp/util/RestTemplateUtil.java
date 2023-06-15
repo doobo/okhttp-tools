@@ -1,5 +1,6 @@
 package com.github.doobo.okhttp.util;
 
+import com.github.doobo.okhttp.spring.OkHttpToolsConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
@@ -13,33 +14,39 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
- * restTemplate公共请求方法
+ * http简单方法
  */
 public abstract class RestTemplateUtil {
 
     private static final Logger log = LoggerFactory.getLogger(RestTemplateUtil.class);
 
-    private static final Set<String> removeHeaderSet = new HashSet<>();
+    protected static HttpHeaders headers;
+    
+    protected static RestTemplate instance;
+    
+    protected static final Set<String> removeHeaderSet = new HashSet<>();
+    
+    static {
+        instance = OkHttpToolsConfig.getRestTemplate();
+        if(Objects.isNull(instance)){
+            instance = OkHttpToolsConfig.getInstanceRestTemplate(null);
+        }
+        headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+        headers.add(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
+    }
 
-    private static RestTemplate instance;
+    public static void setInstance(RestTemplate instance) {
+        RestTemplateUtil.instance = instance;
+    }
 
     public static RestTemplate getInstance() {
-        if(Objects.nonNull(instance)){
-            return instance;
-        }
-        synchronized (RestTemplateUtil.class){
-            if(Objects.isNull(instance)){
-                instance = OkHttpPropertyUtil.getInstance();
-            }
-        }
         return instance;
     }
 
@@ -95,7 +102,7 @@ public abstract class RestTemplateUtil {
      */
     public static <T> T getExchange(String url, HttpServletRequest request
             , ParameterizedTypeReference<T> responseType) {
-        return RestTemplateUtil.getInstance().exchange(param(request, url)
+        return instance.exchange(param(request, url)
                 , HttpMethod.GET, paramBody(null, getRequestHeader(request))
                 , responseType).getBody();
     }
@@ -105,7 +112,7 @@ public abstract class RestTemplateUtil {
      */
     public static <T> T getByProxy(String url, HttpServletRequest request
             , Class<T> responseType, Object ...uriVariables) {
-        return RestTemplateUtil.getInstance().exchange(param(request, url)
+        return instance.exchange(param(request, url)
                 , HttpMethod.GET, new HttpEntity<>(getRequestHeader(request))
                 , responseType, uriVariables).getBody();
     }
@@ -115,7 +122,7 @@ public abstract class RestTemplateUtil {
      */
     public static <T> ResponseEntity<T> getByHeader(String url, HttpServletRequest request
             , Class<T> cls, HttpHeaders headers, Object... uriVariables) {
-        return RestTemplateUtil.getInstance().exchange(paramGet(request, url), HttpMethod.GET
+        return instance.exchange(paramGet(request, url), HttpMethod.GET
                 , new HttpEntity<>(headers), cls, uriVariables);
     }
 
@@ -124,7 +131,7 @@ public abstract class RestTemplateUtil {
      */
     public static <T> T get(String url, ParameterizedTypeReference<T> responseType
             , HttpHeaders headers, Object ...uriVariables) {
-        return RestTemplateUtil.getInstance().exchange(url
+        return instance.exchange(url
                 , HttpMethod.GET, new HttpEntity<>(headers)
                 , responseType, uriVariables).getBody();
     }
@@ -134,7 +141,8 @@ public abstract class RestTemplateUtil {
      */
     public static <T> ResponseEntity<T> getByClass(String url, Class<T> cls
             , HttpHeaders headers, Object... uriVariables) {
-        return RestTemplateUtil.getInstance().exchange(url, HttpMethod.GET
+        headers = Optional.ofNullable(headers).orElse(RestTemplateUtil.headers);
+        return instance.exchange(url, HttpMethod.GET
                 , new HttpEntity<>( headers), cls, uriVariables);
     }
 
@@ -143,7 +151,7 @@ public abstract class RestTemplateUtil {
      */
     public static <T> T postExchange(String url, HttpServletRequest request
             , Object data, ParameterizedTypeReference<T> responseType) {
-        return RestTemplateUtil.getInstance().exchange(param(request, url)
+        return instance.exchange(param(request, url)
                 , HttpMethod.POST, paramBody(request, data)
                 , responseType).getBody();
     }
@@ -153,7 +161,7 @@ public abstract class RestTemplateUtil {
      */
     public static <T> T postByParams(String url, HttpServletRequest request
             , Object data, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
-        return RestTemplateUtil.getInstance().exchange(param(request, url)
+        return instance.exchange(param(request, url)
                 , HttpMethod.POST, paramBody(request, data)
                 , responseType, uriVariables).getBody();
     }
@@ -163,7 +171,8 @@ public abstract class RestTemplateUtil {
      */
     public static <T> T post(String url, String data, ParameterizedTypeReference<T> responseType
             , HttpHeaders headers, Object ...uriVariables) {
-        return RestTemplateUtil.getInstance().exchange(url
+        headers = Optional.ofNullable(headers).orElse(RestTemplateUtil.headers);
+        return instance.exchange(url
                 , HttpMethod.POST, new HttpEntity<>(data, headers)
                 , responseType, uriVariables).getBody();
     }
@@ -173,7 +182,8 @@ public abstract class RestTemplateUtil {
      */
     public static <T> ResponseEntity<T> postByClass(String url, String data
             , Class<T> cls, HttpHeaders headers, Object ...uriVariables) {
-        return RestTemplateUtil.getInstance().exchange(url
+        headers = Optional.ofNullable(headers).orElse(RestTemplateUtil.headers);
+        return instance.exchange(url
                 , HttpMethod.POST, new HttpEntity<>(data, headers)
                 , cls, uriVariables);
     }
@@ -183,7 +193,7 @@ public abstract class RestTemplateUtil {
      */
     public static <T> T putExchange(String url, HttpServletRequest request, Object data
             , ParameterizedTypeReference<T> responseType) {
-        return RestTemplateUtil.getInstance().exchange(param(request, url)
+        return instance.exchange(param(request, url)
                 , HttpMethod.PUT, new HttpEntity<>(data, getRequestHeader(request))
                 , responseType).getBody();
     }
@@ -193,7 +203,7 @@ public abstract class RestTemplateUtil {
      */
     public static <T> T putByParams(String url, HttpServletRequest request
             , Object data, Class<T> responseType, Object ...uriVariables) {
-        return RestTemplateUtil.getInstance().exchange(param(request, url)
+        return instance.exchange(param(request, url)
                 , HttpMethod.PUT, paramBody(request, data)
                 , responseType, uriVariables).getBody();
     }
@@ -203,7 +213,8 @@ public abstract class RestTemplateUtil {
      */
     public static <T> T put(String url, String data, ParameterizedTypeReference<T> responseType
             , HttpHeaders headers, Object ...uriVariables) {
-        return RestTemplateUtil.getInstance().exchange(url
+        headers = Optional.ofNullable(headers).orElse(RestTemplateUtil.headers);
+        return instance.exchange(url
                 , HttpMethod.PUT, new HttpEntity<>(data, headers)
                 , responseType, uriVariables).getBody();
     }
@@ -213,7 +224,8 @@ public abstract class RestTemplateUtil {
      */
     public static <T> ResponseEntity<T> putByClass(String url, String data, Class<T> responseType
             , HttpHeaders headers, Object ...uriVariables) {
-        return RestTemplateUtil.getInstance().exchange(url
+        headers = Optional.ofNullable(headers).orElse(RestTemplateUtil.headers);
+        return instance.exchange(url
                 , HttpMethod.PUT, new HttpEntity<>(data, headers)
                 , responseType, uriVariables);
     }
@@ -223,7 +235,7 @@ public abstract class RestTemplateUtil {
      */
     public static <T> T delExchange(String url, HttpServletRequest request, Object data
             , ParameterizedTypeReference<T> responseType) {
-        return RestTemplateUtil.getInstance().exchange(param(request, url)
+        return instance.exchange(param(request, url)
                 , HttpMethod.DELETE, paramBody(request, data)
                 , responseType).getBody();
     }
@@ -233,7 +245,7 @@ public abstract class RestTemplateUtil {
      */
     public static <T> T delExchange(String url, HttpServletRequest request
             , Object data, ParameterizedTypeReference<T> responseType, Object ...uriVariables) {
-        return RestTemplateUtil.getInstance().exchange(param(request, url)
+        return instance.exchange(param(request, url)
                 , HttpMethod.DELETE, paramBody(request, data)
                 , responseType, uriVariables).getBody();
     }
@@ -243,7 +255,8 @@ public abstract class RestTemplateUtil {
      */
     public static <T> T del(String url, String data, ParameterizedTypeReference<T> responseType
             , HttpHeaders headers, Object ...uriVariables) {
-        return RestTemplateUtil.getInstance().exchange(url
+        headers = Optional.ofNullable(headers).orElse(RestTemplateUtil.headers);
+        return instance.exchange(url
                 , HttpMethod.DELETE, new HttpEntity<>(data, headers)
                 , responseType, uriVariables).getBody();
     }
@@ -253,7 +266,8 @@ public abstract class RestTemplateUtil {
      */
     public static <T> ResponseEntity<T> delByClass(String url, String data
             , Class<T> responseType, HttpHeaders headers, Object ...uriVariables) {
-        return RestTemplateUtil.getInstance().exchange(url
+        headers = Optional.ofNullable(headers).orElse(RestTemplateUtil.headers);
+        return instance.exchange(url
                 , HttpMethod.DELETE, new HttpEntity<>(data, headers)
                 , responseType, uriVariables);
     }
@@ -263,7 +277,8 @@ public abstract class RestTemplateUtil {
      */
     public static <T> T head(String url, String data, ParameterizedTypeReference<T> responseType
             , HttpHeaders headers, Object ...uriVariables) {
-        return RestTemplateUtil.getInstance().exchange(url
+        headers = Optional.ofNullable(headers).orElse(RestTemplateUtil.headers);
+        return instance.exchange(url
                 , HttpMethod.HEAD, new HttpEntity<>(data, headers)
                 , responseType, uriVariables).getBody();
     }
@@ -273,7 +288,8 @@ public abstract class RestTemplateUtil {
      */
     public static <T> ResponseEntity<T> headByClass(String url, String data
             , Class<T> responseType, HttpHeaders headers, Object ...uriVariables) {
-        return RestTemplateUtil.getInstance().exchange(url
+        headers = Optional.ofNullable(headers).orElse(RestTemplateUtil.headers);
+        return instance.exchange(url
                 , HttpMethod.HEAD, new HttpEntity<>(data, headers)
                 , responseType, uriVariables);
     }
@@ -283,7 +299,8 @@ public abstract class RestTemplateUtil {
      */
     public static <T> T trace(String url, String data, ParameterizedTypeReference<T> responseType
             , HttpHeaders headers, Object ...uriVariables) {
-        return RestTemplateUtil.getInstance().exchange(url
+        headers = Optional.ofNullable(headers).orElse(RestTemplateUtil.headers);
+        return instance.exchange(url
                 , HttpMethod.TRACE, new HttpEntity<>(data, headers)
                 , responseType, uriVariables).getBody();
     }
@@ -293,7 +310,8 @@ public abstract class RestTemplateUtil {
      */
     public static <T> ResponseEntity<T> traceByClass(String url, String data, Class<T> responseType
             , HttpHeaders headers, Object ...uriVariables) {
-        return RestTemplateUtil.getInstance().exchange(url
+        headers = Optional.ofNullable(headers).orElse(RestTemplateUtil.headers);
+        return instance.exchange(url
                 , HttpMethod.TRACE, new HttpEntity<>(data, headers)
                 , responseType, uriVariables);
     }
@@ -303,7 +321,8 @@ public abstract class RestTemplateUtil {
      */
     public static <T> T patch(String url, String data, ParameterizedTypeReference<T> responseType
             , HttpHeaders headers, Object ...uriVariables) {
-        return RestTemplateUtil.getInstance().exchange(url
+        headers = Optional.ofNullable(headers).orElse(RestTemplateUtil.headers);
+        return instance.exchange(url
                 , HttpMethod.PATCH, new HttpEntity<>(data, headers)
                 , responseType, uriVariables).getBody();
     }
@@ -313,7 +332,8 @@ public abstract class RestTemplateUtil {
      */
     public static <T> ResponseEntity<T> patchByClass(String url, String data, Class<T> responseType
             , HttpHeaders headers, Object ...uriVariables) {
-        return RestTemplateUtil.getInstance().exchange(url
+        headers = Optional.ofNullable(headers).orElse(RestTemplateUtil.headers);
+        return instance.exchange(url
                 , HttpMethod.PATCH, new HttpEntity<>(data, headers)
                 , responseType, uriVariables);
     }
@@ -323,7 +343,8 @@ public abstract class RestTemplateUtil {
      */
     public static <T> T options(String url, String data, ParameterizedTypeReference<T> responseType
             , HttpHeaders headers, Object ...uriVariables) {
-        return RestTemplateUtil.getInstance().exchange(url
+        headers = Optional.ofNullable(headers).orElse(RestTemplateUtil.headers);
+        return instance.exchange(url
                 , HttpMethod.OPTIONS, new HttpEntity<>(data, headers)
                 , responseType, uriVariables).getBody();
     }
@@ -333,7 +354,8 @@ public abstract class RestTemplateUtil {
      */
     public static <T> ResponseEntity<T> optionsByClass(String url, Class<T> responseType
             , HttpHeaders headers, Object ...uriVariables) {
-        return RestTemplateUtil.getInstance().exchange(url
+        headers = Optional.ofNullable(headers).orElse(RestTemplateUtil.headers);
+        return instance.exchange(url
                 , HttpMethod.OPTIONS, new HttpEntity<>(headers)
                 , responseType, uriVariables);
     }
@@ -348,7 +370,7 @@ public abstract class RestTemplateUtil {
         headers.remove("ContentType");
         headers.setContentType(MediaType.parseMediaType("multipart/form-data;charset=UTF-8"));
         if(body == null || body.isEmpty()){
-            return RestTemplateUtil.getInstance().exchange(param(request,url)
+            return instance.exchange(param(request,url)
                     , HttpMethod.POST, new HttpEntity<>(body, headers), reference, uriVariables).getBody();
         }
         MultiValueMap<String, Object> param = new LinkedMultiValueMap<>();
@@ -386,7 +408,7 @@ public abstract class RestTemplateUtil {
             }
         }
         try {
-            return RestTemplateUtil.getInstance().exchange(paramGet(request,url),
+            return instance.exchange(paramGet(request,url),
                     HttpMethod.POST, new HttpEntity<>(param, headers), reference, uriVariables).getBody();
         } finally {
             deleteLocalTempFiles(tempList);
@@ -451,95 +473,9 @@ public abstract class RestTemplateUtil {
             return url;
         }
         url = url.contains("?")?(url + "&"):(url+"?");
-        return url + getQueryString(request.getQueryString());
+        return url + UrlUtils.getQueryString(request.getQueryString(), false);
     }
-
-    public static MultiValueMap<String, String> stringToMap(String str){
-        //判断str是否有值
-        if (null == str || "".equals(str)){
-            return null;
-        }
-        //根据&截取
-        String[] strings = str.split("&");
-        MultiValueMap<String,String> map = new LinkedMultiValueMap<String, String>();
-        //循环加入map
-        for (String string : strings) {
-            String[] strArray = string.split("=");
-            map.add(strArray[0], strArray[1]);
-        }
-        return map;
-    }
-
-    /**
-     * 获取查询字符串
-     */
-    public static String getQueryString(String str) {
-        if ( str == null ||  str.isEmpty()){
-            return "";
-        }
-        log.debug(str);
-        MultiValueMap<String, String> map = stringToMap(str);
-        return multiValueMapToUrl(map);
-    }
-
-    /**
-     * 组装Get参数
-     */
-    public static String multiValueMapToUrl(MultiValueMap<String, String> map) {
-        if(map == null || map.isEmpty()){
-            return "";
-        }
-        Map<String,String[]> rMap = new HashMap<>();
-        map.keySet().stream().filter(Objects::nonNull)
-                .forEach(m->{
-                    List<String> tmp = map.get(m);
-                    if(tmp != null){
-                        rMap.put(m, tmp.toArray(new String[0]));
-                    }
-                });
-        return getMapArrToString(rMap);
-    }
-
-    /**
-     * 字段排序,并编码拼接字符串
-     */
-    public static String getMapArrToString(Map<String, String[]> map) {
-        if(map == null || map.isEmpty()){
-            return "";
-        }
-        Set<String> keySet = map.keySet();
-        String[] keyArray = keySet.toArray(new String[0]);
-        Arrays.sort(keyArray);
-        StringBuilder sb = new StringBuilder();
-        String key;
-        String[] ss;
-        for (String s : keyArray) {
-            key = s;
-            ss = map.get(key);
-            if (ss == null || ss.length == 0) {
-                continue;
-            }
-            //同名参数,再对值排序
-            Arrays.sort(ss);
-            for (String st : ss) {
-                if (st != null) {
-                    try {
-                        String dv = URLEncoder.encode(st, UTF_8.name());
-                        sb.append(key).append("=").append(dv).append("&");
-                    } catch (Exception e) {
-                        log.error("encodeError", e);
-                        sb.append(key).append("=").append(st).append("&");
-                    }
-                }
-            }
-        }
-        //去除最后的'&'符号
-        if(sb.toString().endsWith("&")){
-            sb.deleteCharAt(sb.length() - 1);
-        }
-        return sb.toString();
-    }
-
+    
     /**
      * 获取文件后转发给前端
      */
