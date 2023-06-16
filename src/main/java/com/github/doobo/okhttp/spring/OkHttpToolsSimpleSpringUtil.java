@@ -18,14 +18,14 @@ import java.util.Objects;
  * spring基础工具
  */
 @Configuration
-public class SimpleSpringUtil implements ApplicationContextAware {
+public class OkHttpToolsSimpleSpringUtil implements ApplicationContextAware {
 
 	private static ApplicationContext applicationContext;
 
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-		if(SimpleSpringUtil.applicationContext == null) {
-			SimpleSpringUtil.applicationContext = applicationContext;
+		if(OkHttpToolsSimpleSpringUtil.applicationContext == null) {
+			OkHttpToolsSimpleSpringUtil.applicationContext = applicationContext;
 		}
 	}
 
