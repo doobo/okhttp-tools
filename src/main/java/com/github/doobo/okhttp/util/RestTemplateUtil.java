@@ -1,5 +1,6 @@
 package com.github.doobo.okhttp.util;
 
+import com.github.doobo.okhttp.spring.OkHttpToolsBeanConfig;
 import com.github.doobo.okhttp.spring.OkHttpToolsConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +34,7 @@ public abstract class RestTemplateUtil {
     protected static final Set<String> removeHeaderSet = new HashSet<>();
     
     static {
-        instance = OkHttpToolsConfig.getRestTemplate();
+        instance = OkHttpToolsBeanConfig.getRestTemplate();
         if(Objects.isNull(instance)){
             instance = OkHttpToolsConfig.getInstanceRestTemplate(null);
         }

@@ -6,8 +6,6 @@ import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -28,7 +26,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -38,47 +35,27 @@ import java.util.Optional;
 public class OkHttpToolsConfig {
 
 	private static final Logger log = LoggerFactory.getLogger(OkHttpToolsConfig.class);
-	
-	private static RestTemplate restTemplate;
-	
-	private static OKHttpProperties okHttpProperties;
-	
+
 	@Primary
 	@Bean(name = "oKHttpProperties")
 	@ConfigurationProperties("okhttp.tools")
 	@ConditionalOnProperty(name = "okhttp.tools.startConfig", havingValue = "true")
 	@ConditionalOnMissingBean(name = "oKHttpProperties")
 	public OKHttpProperties oKHttpPropertiesByConfig() {
-		OkHttpToolsConfig.okHttpProperties = new OKHttpProperties();
-		return OkHttpToolsConfig.okHttpProperties;
+		return new OKHttpProperties();
 	}
 
 	@Bean(name ="fastRestTemplate")
 	@ConditionalOnMissingBean(name = "fastRestTemplate")
 	public RestTemplate fastRestTemplate(OKHttpProperties okHttpProperties){
-		OkHttpToolsConfig.restTemplate = getInstanceRestTemplate(okHttpProperties);
-		return OkHttpToolsConfig.restTemplate;
-	}
-
-	public static OKHttpProperties getOkHttpProperties() {
-		if(Objects.isNull(okHttpProperties)){
-			return OkhttpToolsDefaultConfig.getOkHttpProperties();
-		}
-		return okHttpProperties;
-	}
-
-	/**
-	 * 获取http模板
-	 */
-	public static RestTemplate getRestTemplate() {
-		return restTemplate;
+		return getInstanceRestTemplate(okHttpProperties);
 	}
 
 	/**
 	 * 初始化restTemplate
 	 */
 	public static RestTemplate getInstanceRestTemplate(OKHttpProperties okHttpProperties){
-		okHttpProperties = Optional.ofNullable(okHttpProperties).orElseGet(OkHttpToolsConfig::getOkHttpProperties);
+		okHttpProperties = Optional.ofNullable(okHttpProperties).orElseGet(OKHttpProperties::new);
 		ClientHttpRequestFactory factory = httpRequestFactory(okHttpProperties);
 		RestTemplate restTemplate = new RestTemplate(factory);
 		restTemplate.setErrorHandler(new AcceptResponseErrorHandler());
