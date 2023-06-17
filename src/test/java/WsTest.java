@@ -18,7 +18,7 @@ public class WsTest {
     @Test
     public void testWsConnect() throws InterruptedException {
         CountDownLatch countDownLatch = new CountDownLatch(1);
-        String wsUrl = "ws://sport-daily.ttyingqiu.com/chatroomServer/1021";
+        String wsUrl = "ws://***";
         //新建client
         OkHttpClient client = new OkHttpClient.Builder()
                 .build();
@@ -105,7 +105,7 @@ public class WsTest {
     @Test
     public void testResult() throws InterruptedException {
         CountDownLatch countDownLatch = new CountDownLatch(1);
-        String wsUrl = "ws://sport-daily.ttyingqiu.com/chatroomServer/1021";
+        String wsUrl = "ws://***";
 
 
         WsBuilder builder = OkHttpClientTools.getInstance().ws()

@@ -18,7 +18,7 @@ public class WsBuilder extends OkHttpRequestBuilderHasParam<WsBuilder> {
 
     private WsManager wsManager;
 
-    private String originHost = "www.baidu.com";
+    private String originHost = "5fu8.com";
 
     @Override
     void enqueue(IResponseHandler iResponseHandler) {

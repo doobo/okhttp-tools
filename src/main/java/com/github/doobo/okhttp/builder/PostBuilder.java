@@ -41,7 +41,7 @@ public class PostBuilder extends OkHttpRequestBuilderHasParam<PostBuilder> {
             }
 
             if(mJsonParams.length() > 0) {//上传json格式参数
-                RequestBody body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), mJsonParams);
+                RequestBody body = RequestBody.create(mJsonParams, MediaType.parse("application/json; charset=utf-8"));
                 builder.post(body);
             } else {//普通kv参数
                 FormBody.Builder encodingBuilder = new FormBody.Builder();

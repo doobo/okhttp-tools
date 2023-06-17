@@ -10,7 +10,7 @@
  <dependency>
    <groupId>com.github.doobo</groupId>
    <artifactId>okhttp-tools</artifactId>
-   <version>1.3</version>
+   <version>1.3.1</version>
  </dependency>
 ```
 
